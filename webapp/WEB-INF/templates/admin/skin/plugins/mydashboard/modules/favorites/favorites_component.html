@@ -1,0 +1,51 @@
+<div class="portlet portlet-demandes">
+    <h2>#i18n{module.crm.mydashboardfavorites.component.favorites.description} <i title="I can tell you the license plate numbers of all six cars outside. I can tell you that our waitress is left-handed and the guy sitting up at the counter weighs two hundred fifteen pounds" data-placement="right" data-toggle="tooltip" aria-hidden="true" class="fa fa-question-circle"> </i>
+        </h2>
+    <p>
+        <a data-target="#myFavorites"" data-toggle="modal" href="#" id="myfav" class="btn btn-link">#i18n{module.crm.mydashboardfavorites.component.favorites.modify}</a>
+    </p>
+        <#list favorites_checked_list?sort_by("label") as favorite>
+            <a class="btn btn-info btn-demande" target="_self" href="${favorite.urlResource}">${favorite.label}</a>
+        </#list>
+</div>
+
+<#function isFavoriteChecked favorites_checked_list favorite>
+    <#if favorites_checked_list?? && favorites_checked_list?has_content>
+        <#list favorites_checked_list as favorite_checked>
+            <#if favorite_checked.idDemandType?string = favorite.code>
+                <#return true>
+            </#if>
+        </#list>
+    </#if>
+    <#return false>
+</#function>
+
+<div class="modal fade" id="myFavorites" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="myModalLabel">#i18n{module.crm.mydashboardfavorites.add.favorites}</h3>
+      </div>
+      <div class="modal-body">
+        <form class="form" action="jsp/site/Portal.jsp" >
+            <input type="hidden" name="page" value="favorites" />
+            <#if favorites_list?has_content>
+               <#list favorites_list?sort_by("name") as favorite>
+                    <p>
+                      <input type="checkbox" value="${favorite.code}" name="favorites" id="favorite_${favorite.code}" <#if isFavoriteChecked( favorites_checked_list,favorite ) >checked="checked" </#if>/>
+                      <label for="favorite_${favorite.code}">${favorite.name}</label>
+                    </p>
+                </#list>
+            </#if>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary" name="action_modify_favorites">#i18n{module.crm.mydashboardfavorites.validate.favorites}</button>
+            </div>
+          </form>
+        </div>
+        
+    </div>
+  </div>
+</div>
+
+
+

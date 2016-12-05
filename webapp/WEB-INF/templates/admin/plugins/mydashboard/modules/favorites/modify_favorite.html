@@ -1,0 +1,15 @@
+<#include "managefavorites_tabs.html" />
+<@tabs tab="favorite" />
+
+<@rowBoxHeader i18nTitleKey="favorites.modify_favorite.title">
+    <form class="form-horizontal" method="post" name="modify_favorite" action="jsp/admin/plugins/favorites/ManageFavorites.jsp">
+        <@messages errors=errors />
+        <input type="hidden" id="id" name="id" value="${favorite.id}"/>
+        
+        <@fieldInputText i18nLabelKey="favorites.modify_favorite.labelLabel" inputName="label" mandatory=true value="${favorite.label}" i18nHelpBlockKey="favorites.modify_favorite.labelLabel.help" />
+        <@fieldInputText i18nLabelKey="favorites.modify_favorite.labelUrl" inputName="url" mandatory=true value="${favorite.url}" i18nHelpBlockKey="favorites.modify_favorite.labelUrl.help" />
+        <@fieldInputText i18nLabelKey="favorites.modify_favorite.labelIsActivated" inputName="isactivated" mandatory=true value="${favorite.isActivated}" i18nHelpBlockKey="favorites.modify_favorite.labelIsActivated.help" />
+        <@actionButtons button1Name="action_modifyFavorite" button2Name="view_manageFavorites"/>
+    </form>
+</@rowBoxHeader>
+
