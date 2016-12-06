@@ -1,0 +1,1 @@
+# module-mydashboard-favorites
