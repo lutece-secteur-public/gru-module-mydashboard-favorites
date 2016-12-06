@@ -109,6 +109,15 @@ public final class FavoriteHome
     }
     
     /**
+     * Load the data of all the activated favorite objects and returns them as a list
+     * @return the list which contains the data of all the favorite objects
+     */
+    public static List<Favorite> getActivatedFavoritesList( )
+    {
+        return _dao.selectActivatedFavoritesList( _plugin );
+    }
+    
+    /**
      * Load the id of all the favorite objects and returns them as a list
      * @return the list which contains the id of all the favorite objects
      */

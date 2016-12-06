@@ -23,16 +23,21 @@
     <admin-features>
         <admin-feature>
             <feature-id>FAVORITES_MANAGEMENT</feature-id>
-            <feature-title>favorites.adminFeature.ManageFavorites.name</feature-title>
-            <feature-description>favorites.adminFeature.ManageFavorites.description</feature-description>
-            <feature-level>0</feature-level>
-            <feature-url>jsp/admin/plugins/favorites/ManageFavorites.jsp</feature-url>
+            <feature-title>module.mydashboard.favorites.adminFeature.ManageFavorites.name</feature-title>
+            <feature-description>module.mydashboard.favorites.adminFeature.ManageFavorites.description</feature-description>
+            <feature-level>1</feature-level>
+            <feature-url>jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp</feature-url>
             <feature-icon-url></feature-icon-url>
       </admin-feature>
     </admin-features>    
 
     <!-- XPages parameters -->
+
     <applications>
+        <application>
+            <application-id>favorites</application-id>
+            <application-class>fr.paris.lutece.plugins.mydashboard.modules.favorites.web.MyDashBoardFavoritesXPage</application-class>
+        </application>
     </applications>
 
     <!-- Portlet parameters -->

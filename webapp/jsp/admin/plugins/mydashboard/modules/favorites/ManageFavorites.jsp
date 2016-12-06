@@ -1,10 +1,9 @@
-<%@ page errorPage="../../../../ErrorPage.jsp" %>
+<jsp:useBean id="managefavorites" scope="session" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.web.FavoriteJspBean" />
+<% String strContent =  managefavorites.processController( request, response ); %>
 
+<%@ page errorPage="../../../../ErrorPage.jsp" %>
 <jsp:include page="../../../../AdminHeader.jsp" />
 
-<jsp:useBean id="managefavorites" scope="session" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.web.ManageFavoritesJspBean" />
-
-<% managefavorites.init( request, managefavorites.RIGHT_MANAGEFAVORITES ); %>
-<%= managefavorites.getManageFavoritesHome ( request ) %>
+<%= strContent %>
 
 <%@ include file="../../../../AdminFooter.jsp" %>

@@ -47,12 +47,12 @@ public class Favorite implements Serializable
     // Variables declarations 
     private int _nId;
     
-    @NotEmpty( message = "#i18n{favorites.validation.favorite.Label.notEmpty}" )
-    @Size( max = 255 , message = "#i18n{favorites.validation.favorite.Label.size}" ) 
+    @NotEmpty( message = "#i18n{module.mydashboard.favorites.validation.favorite.Label.notEmpty}" )
+    @Size( max = 255 , message = "#i18n{module.mydashboard.favorites.validation.favorite.Label.size}" ) 
     private String _strLabel;
     @URL(message = "#i18n{portal.validation.message.url}")
-    @NotEmpty( message = "#i18n{favorites.validation.favorite.Url.notEmpty}" )
-    @Size( max = 255 , message = "#i18n{favorites.validation.favorite.Url.size}" ) 
+    @NotEmpty( message = "#i18n{module.mydashboard.favorites.validation.favorite.Url.notEmpty}" )
+    @Size( max = 255 , message = "#i18n{module.mydashboard.favorites.validation.favorite.Url.size}" ) 
     private String _strUrl;
     
     private boolean _bIsActivated;

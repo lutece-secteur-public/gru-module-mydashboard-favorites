@@ -35,8 +35,15 @@ package fr.paris.lutece.plugins.mydashboard.modules.favorites.web;
 
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHome;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
+import fr.paris.lutece.plugins.mydashboard.service.IMyDashboardComponent;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
+import fr.paris.lutece.portal.service.plugin.PluginEvent;
+import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
@@ -61,9 +68,9 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String PARAMETER_ID_FAVORITE = "id";
 
     // Properties for page titles
-    private static final String PROPERTY_PAGE_TITLE_MANAGE_FAVORITES = "favorites.manage_favorites.pageTitle";
-    private static final String PROPERTY_PAGE_TITLE_MODIFY_FAVORITE = "favorites.modify_favorite.pageTitle";
-    private static final String PROPERTY_PAGE_TITLE_CREATE_FAVORITE = "favorites.create_favorite.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MANAGE_FAVORITES = "module.mydashboard.favorites.manage_favorites.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MODIFY_FAVORITE = "module.mydashboard.favorites.modify_favorite.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_CREATE_FAVORITE = "module.mydashboard.favorites.create_favorite.pageTitle";
 
     // Markers
     private static final String MARK_FAVORITE_LIST = "favorite_list";
@@ -72,7 +79,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String JSP_MANAGE_FAVORITES = "jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp";
     
     // Properties
-    private static final String MESSAGE_CONFIRM_REMOVE_FAVORITE = "favorites.message.confirmRemoveFavorite";
+    private static final String MESSAGE_CONFIRM_REMOVE_FAVORITE = "module.mydashboard.favorites.message.confirmRemoveFavorite";
 
     // Validations
     private static final String VALIDATION_ATTRIBUTES_PREFIX = "favorites.model.entity.favorite.attribute.";
@@ -87,11 +94,12 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String ACTION_MODIFY_FAVORITE = "modifyFavorite";
     private static final String ACTION_REMOVE_FAVORITE = "removeFavorite";
     private static final String ACTION_CONFIRM_REMOVE_FAVORITE = "confirmRemoveFavorite";
+    private static final String ACTION_TOGGLE_ACTIVATION_FAVORITE = "toggleActivationFavorite";
 
     // Infos
-    private static final String INFO_FAVORITE_CREATED = "favorites.info.favorite.created";
-    private static final String INFO_FAVORITE_UPDATED = "favorites.info.favorite.updated";
-    private static final String INFO_FAVORITE_REMOVED = "favorites.info.favorite.removed";
+    private static final String INFO_FAVORITE_CREATED = "module.mydashboard.favorites.info.favorite.created";
+    private static final String INFO_FAVORITE_UPDATED = "module.mydashboard.favorites.info.favorite.updated";
+    private static final String INFO_FAVORITE_REMOVED = "module.mydashboard.favorites.info.favorite.removed";
     
     // Session variable to store working values
     private Favorite _favorite;
@@ -226,6 +234,25 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         }
 
         FavoriteHome.update( _favorite );
+        addInfo( INFO_FAVORITE_UPDATED, getLocale(  ) );
+
+        return redirectView( request, VIEW_MANAGE_FAVORITES );
+    }
+    
+    /**
+     * Toggle the activation of a favorite
+     *
+     * @param request The Http request
+     * @return The Jsp URL of the process result
+     */
+    @Action( ACTION_TOGGLE_ACTIVATION_FAVORITE )
+    public String doToggleActivationFavorite( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );
+        Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( nId );
+        favorite.setIsActivated( ( favorite.getIsActivated( ) ) ? false : true );
+
+        FavoriteHome.update( favorite );
         addInfo( INFO_FAVORITE_UPDATED, getLocale(  ) );
 
         return redirectView( request, VIEW_MANAGE_FAVORITES );

@@ -41,6 +41,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoritesSubscriptionProviderService;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.util.UrlUtil;
 import fr.paris.lutece.plugins.mydashboard.service.MyDashboardComponent;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
@@ -55,46 +56,51 @@ import java.util.ArrayList;
 
 public class MyDashboardFavoritesComponent extends MyDashboardComponent
 {
-    private static final String DASHBOARD_COMPONENT_ID = "crm-mydashboard-favorites.favoritesComponent";
-    private static final String MESSAGE_DASHBOARD_COMPONENT_DESCRIPTION = "module.crm.mydashboard.favorites.component.description";
-    private static final String TEMPLATE_DASHBOARD_COMPONENT = "skin/plugins/crm/modules/mydashboard/favorites/favorites_component.html";
+    private static final String DASHBOARD_COMPONENT_ID = "mydashboard.myDashboardComponentFavorite";
+    private static final String MESSAGE_DASHBOARD_COMPONENT_DESCRIPTION = "module.mydashboard.favorites.component.description";
+    private static final String TEMPLATE_DASHBOARD_COMPONENT = "skin/plugins/mydashboard/modules/favorites/favorites_component.html";
     
     //Subscription providers 
 
     //Markers
     private static final String MARK_FAVORITES_CHECKED_LIST = "favorites_checked_list";
     private static final String MARK_FAVORITES_LIST = "favorites_list";
+    private static final String MARK_REDIRECT_URL = "redirect_url";
+    
+    
+    
 
     @Override
     public String getDashboardData( HttpServletRequest request )  
     {
         Map<String, Object> model = new HashMap<String, Object>(  );
         
-        LuteceUser user = SecurityService.getInstance().getRegisteredUser( request );
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
         //research by filter on user guid and for favorites provider
-        SubscriptionFilter sFilter = new SubscriptionFilter(  );
-        sFilter.setIdSubscriber( user.getName(  ) );
-        sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance(  ).getProviderName(  ) );
+        SubscriptionFilter sFilter = new SubscriptionFilter( );
+        sFilter.setIdSubscriber( user.getName( ) );
+        sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
         List<Subscription> listFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter );  
         //get favorites about those subscriptions
-        List<Favorite> listFavoritesSuscribed = new ArrayList(  );
+        List<Favorite> listFavoritesSuscribed = new ArrayList( );
         for ( Subscription sub : listFavorites )
         {
-            listFavoritesSuscribed.add( FavoriteService.getInstance(  ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource(  ) ) ) );
+            listFavoritesSuscribed.add( FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) ) );
         }
 
         model.put( MARK_FAVORITES_CHECKED_LIST, listFavoritesSuscribed );
-        model.put( MARK_FAVORITES_LIST , FavoriteService.getInstance(  ).findAllFavorites(  ) );
+        model.put( MARK_FAVORITES_LIST , FavoriteService.getInstance( ).findAllActivatedFavorites( ) );
+        model.put( MARK_REDIRECT_URL, UrlUtil.getFullUrl( request ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DASHBOARD_COMPONENT, LocaleService.getDefault(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DASHBOARD_COMPONENT, LocaleService.getDefault( ), model );
 
-        return template.getHtml(  );
+        return template.getHtml( );
     }
     
 
 
     @Override
-    public String getComponentId(  )
+    public String getComponentId( )
     {
         return DASHBOARD_COMPONENT_ID;
     }

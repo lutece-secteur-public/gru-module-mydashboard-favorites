@@ -1,15 +1,19 @@
 <#include "managefavorites_tabs.html" />
 <@tabs tab="favorite" />
 
-<@rowBoxHeader i18nTitleKey="favorites.modify_favorite.title">
-    <form class="form-horizontal" method="post" name="modify_favorite" action="jsp/admin/plugins/favorites/ManageFavorites.jsp">
+<@rowBoxHeader i18nTitleKey="module.mydashboard.favorites.modify_favorite.title">
+    <form class="form-horizontal" method="post" name="modify_favorite" action="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp">
         <@messages errors=errors />
         <input type="hidden" id="id" name="id" value="${favorite.id}"/>
-        
-        <@fieldInputText i18nLabelKey="favorites.modify_favorite.labelLabel" inputName="label" mandatory=true value="${favorite.label}" i18nHelpBlockKey="favorites.modify_favorite.labelLabel.help" />
-        <@fieldInputText i18nLabelKey="favorites.modify_favorite.labelUrl" inputName="url" mandatory=true value="${favorite.url}" i18nHelpBlockKey="favorites.modify_favorite.labelUrl.help" />
-        <@fieldInputText i18nLabelKey="favorites.modify_favorite.labelIsActivated" inputName="isactivated" mandatory=true value="${favorite.isActivated}" i18nHelpBlockKey="favorites.modify_favorite.labelIsActivated.help" />
+        <@fieldInputText i18nLabelKey="module.mydashboard.favorites.modify_favorite.labelLabel" inputName="label" mandatory=true value="${favorite.label!''}" i18nHelpBlockKey="module.mydashboard.favorites.modify_favorite.labelLabel.help" />
+        <@fieldInputText i18nLabelKey="module.mydashboard.favorites.modify_favorite.labelUrl" inputName="url" mandatory=true value="${favorite.url!''}" i18nHelpBlockKey="module.mydashboard.favorites.modify_favorite.labelUrl.help" />
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label" for="is_activated">#i18n{module.mydashboard.favorites.modify_favorite.labelIsActivated} :</label>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                <input class="" id="is_activated" name="is_activated" type="checkbox" value="true" <#if favorite.isActivated >checked="checked" </#if> />
+                <p class="help-block">#i18n{module.mydashboard.favorites.modify_favorite.labelIsActivated.help}</p>
+            </div>
+	</div>
         <@actionButtons button1Name="action_modifyFavorite" button2Name="view_manageFavorites"/>
     </form>
 </@rowBoxHeader>
-

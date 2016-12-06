@@ -95,4 +95,11 @@ public interface IFavoriteDAO
      * @return The referenceList which contains the data of all the favorite objects
      */
     ReferenceList selectFavoritesReferenceList( Plugin plugin );
+
+    /**
+     * Load the data of all the activated favorite objects and returns them as a list
+     * @param plugin the Plugin
+     * @return The List which contains the data of all the activated favorite objects
+     */
+    public List<Favorite> selectActivatedFavoritesList( Plugin plugin );
 }

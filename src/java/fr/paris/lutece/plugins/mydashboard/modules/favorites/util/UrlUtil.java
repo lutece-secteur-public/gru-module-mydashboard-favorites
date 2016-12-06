@@ -31,67 +31,24 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mydashboard.modules.favorites.service;
+package fr.paris.lutece.plugins.mydashboard.modules.favorites.util;
 
-import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
-import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHome;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
-/**
- *
- * @author alexandre
- */
-public class FavoriteService {
+public class UrlUtil
+{
+    private static final String CONSTANT_QUERY_SEPARATOR = "?";
     
-    private  static FavoriteService _instance = null ;
-    
-    private FavoriteService(  )
+    /*
+    * Return the full url, url base + query params
+    * @param request the HttpServletRequest
+    * @return the full url
+    */
+    public static String getFullUrl ( HttpServletRequest request )
     {
-        
-    };
-    
-    /**
-     * Get the instance of this service singleton
-     * @return the singleton of this service
-     */
-    public static FavoriteService getInstance( )
-    {
-        if ( _instance == null )
-        {
-            _instance = new FavoriteService( );
-            return _instance ; 
-        }
-        else 
-        {
-            return _instance;
-        }
-    }
-    
-    /**
-     * Load the favorite for the given id
-     * @param idFavorite the id of the favorite to get
-     * @return the favorite data corresponding to the provided id.
-     */
-    public Favorite findByPrimaryKey( int idFavorite )
-    {
-        return FavoriteHome.findByPrimaryKey( idFavorite );
-    }
-    
-    /**
-     * Load all the favorites
-     * @return the list of all the favorites datas.
-     */
-    public List<Favorite> findAllFavorites( )
-    {
-        return FavoriteHome.getFavoritesList( );
-    }
-    
-    /**
-     * Load all the activated favorites
-     * @return the list of all the activated favorites datas.
-     */
-    public List<Favorite> findAllActivatedFavorites( )
-    {
-        return FavoriteHome.getActivatedFavoritesList( );
+        StringBuilder strBuild = new StringBuilder ( request.getRequestURL( ) );
+        strBuild.append( CONSTANT_QUERY_SEPARATOR );
+        strBuild.append( request.getQueryString( ) );
+        return strBuild.toString( );
     }
 }

@@ -5,6 +5,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
 
     <bean id="favorites.favoriteDAO" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteDAO" />
-    <bean id="crm-mydashboard-favorites.mydashboardFavoritesComponent" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.web.MyDashboardFavoritesComponent" />
+    <bean id="mydashboard.myDashboardComponentFavorite" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.web.MyDashboardFavoritesComponent" scope="singleton" />
 
 </beans>

@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
 import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
@@ -54,8 +55,9 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
     //Actions
     private static final String ACTION_MODIFY_FAVORITES = "modify_favorites";
     
-    //Redirections
-    private static final String REDIRECT_DASHBOARD = "Portal.jsp?page=mydashboard";
+    //Parameters
+    private static final String PARAMETER_FAVORITES = "favorites";
+    private static final String PARAMETER_REDIRECT_URL = "redirect_url";
     
     //Subscription key for favorites
     private static final String SUBSCRIPTION_KEY = "favorite_key";
@@ -63,18 +65,19 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
     @Action( ACTION_MODIFY_FAVORITES )
     public XPage modifyFavorites( HttpServletRequest request )
     {
-        String[] listFavoritesCheckedId = request.getParameterValues( "favorites" );
+        String[] listFavoritesCheckedId = request.getParameterValues( PARAMETER_FAVORITES );
+        String strRedirectUrl = request.getParameter( PARAMETER_REDIRECT_URL );
         
         //First remove all the favorites subscriptions for the register Lutece user
-        LuteceUser user = SecurityService.getInstance().getRegisteredUser( request );
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
 
-        SubscriptionFilter sFilter = new SubscriptionFilter(  );
-        sFilter.setIdSubscriber( user.getName(  ) );
-        sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance(  ).getProviderName(  ) );
-        List<Subscription> listSubscriptionFavorites = SubscriptionService.getInstance(  ).findByFilter( sFilter ); 
+        SubscriptionFilter sFilter = new SubscriptionFilter( );
+        sFilter.setIdSubscriber( user.getName( ) );
+        sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
+        List<Subscription> listSubscriptionFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter ); 
         for (Subscription sub : listSubscriptionFavorites)
         {
-            SubscriptionService.getInstance(  ).removeSubscription( sub, false);
+            SubscriptionService.getInstance( ).removeSubscription( sub, false);
         }
         
         //Then subscribe new favorites
@@ -82,14 +85,14 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
         {
             for (String strFavoriteId : listFavoritesCheckedId)
             {
-                Subscription sub = new Subscription(  );
+                Subscription sub = new Subscription( );
                 sub.setIdSubscribedResource( strFavoriteId );
-                sub.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance(  ).getProviderName(  ) );
+                sub.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
                 sub.setSubscriptionKey( SUBSCRIPTION_KEY );
-                SubscriptionService.getInstance(  ).createSubscription( sub, user );
+                SubscriptionService.getInstance( ).createSubscription( sub, user );
             }
         }
         
-        return redirect( request, REDIRECT_DASHBOARD );
+        return redirect( request, strRedirectUrl );
     }
 }

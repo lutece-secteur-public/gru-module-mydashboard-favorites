@@ -48,6 +48,10 @@ public class FavoritesSubscriptionProviderService implements ISubscriptionProvid
     
     private static FavoritesSubscriptionProviderService _instance = null;
     
+    /**
+    * Get the instance of this service singleton
+    * @return the singleton of this service
+    */
     public static FavoritesSubscriptionProviderService getInstance(  ){
         if ( _instance == null ){
             _instance = new FavoritesSubscriptionProviderService(  );

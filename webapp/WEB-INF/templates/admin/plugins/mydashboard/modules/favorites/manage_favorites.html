@@ -2,59 +2,74 @@
 <@tabs tab="favorite" />
 
 <@rowBox>
-    <@boxHeader i18nTitleKey="favorites.manage_favorites.title">
+    <@boxHeader i18nTitleKey="module.mydashboard.favorites.manage_favorites.title">
         <@headerButtons>
 
         
-        <form class="form-inline pull-right" method="post" name="manage_favorites" action="jsp/admin/plugins/favorites/ManageFavorites.jsp">
+        <form class="form-inline pull-right" method="post" name="manage_favorites" action="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp">
             <!-- Add pull-right to class1 -->
-            <@actionButtons button1Name="view_createFavorite" icon1="icon-plus icon-white" i18nValue1Key="favorites.manage_favorites.buttonAdd" />
+            <@actionButtons button1Name="view_createFavorite" icon1="icon-plus icon-white" i18nValue1Key="module.mydashboard.favorites.manage_favorites.buttonAdd" />
         </form>
         
-    </@headerButtons>
+        </@headerButtons>
     </@boxHeader>
     <@boxBody>    
-    <@messages infos=infos />
-    <@paginationAdmin paginator=paginator combo=1 />
-    
-    <@table>
-        <tr>
-            <input type="hidden" id="id" name="id"/>
-            <th>#i18n{favorites.manage_favorites.columnLabel}</th>
-            <th>#i18n{favorites.manage_favorites.columnUrl}</th>
-            <th>#i18n{favorites.manage_favorites.columnIsActivated}</th>
-            <th>#i18n{portal.util.labelActions}</th>
-        </tr>
-        <@tableHeadBodySeparator />
-            <#list favorite_list as favorite >
-        <tr>
-            <input type="hidden" id="id" name="id"/>
-            <td>
-                ${favorite.label}
-            </td>
-            <td>
-                ${favorite.url}
-            </td>
-            <td>
-                ${favorite.isActivated}
-            </td>
-        <td>
-            <a href="jsp/admin/plugins/favorites/ManageFavorites.jsp?view=modifyFavorite&id=${favorite.id}"
-               class="btn btn-primary btn-sm" title="#i18n{portal.util.labelModify}">
-                <i class="fa fa-pencil"></i>
-            </a>
+        <@messages infos=infos />
+        <@paginationAdmin paginator=paginator combo=1 />
+            <@table>
+                <tr>
+                    <input type="hidden" id="id" name="id"/>
+                    <th>#i18n{module.mydashboard.favorites.manage_favorites.columnLabel}</th>
+                    <th>#i18n{module.mydashboard.favorites.manage_favorites.columnUrl}</th>
+                    <th>#i18n{module.mydashboard.favorites.manage_favorites.columnIsActivated}</th>
+                    <th>#i18n{portal.util.labelActions}</th>
+                </tr>
+                <@tableHeadBodySeparator />
+                <#list favorite_list as favorite >
+                    <tr>
+                        <input type="hidden" id="id" name="id"/>
+                        <td>
+                            ${favorite.label}
+                        </td>
+                        <td>
+                            ${favorite.url}
+                        </td>
+                        <td>
+                            <#if favorite.isActivated >
+                                <span class="label label-success" title="#i18n{module.mydashboard.favorites.manage_favorites.activated}">
+                                    <i class="fa fa-check"></i> 
+                                </span>
+                            <#else>
+                                <span class="label label-important" title=" #i18n{module.mydashboard.favorites.manage_favorites.desactivated}">
+                                    <i class="fa fa-remove"></i>
+                                </span>
+                            </#if>
+                        </td>
+                        <td>
+                            <a href="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?view=modifyFavorite&id=${favorite.id}"
+                               class="btn btn-primary btn-sm" title="#i18n{portal.util.labelModify}">
+                                <i class="fa fa-pencil"></i>
+                            </a>
 
-            <a href="jsp/admin/plugins/favorites/ManageFavorites.jsp?action=confirmRemoveFavorite&id=${favorite.id}"
-               class="btn btn-danger btn-sm" title="#i18n{portal.util.labelDelete}" >
-                <i class="fa fa-trash"></i>
-            </a>
-        </td>
-        </tr>
-        </#list>
-    </@table>
-
-    <@paginationAdmin paginator=paginator />
-
+                            <a href="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?action=confirmRemoveFavorite&id=${favorite.id}"
+                               class="btn btn-danger btn-sm" title="#i18n{portal.util.labelDelete}" >
+                                <i class="fa fa-trash"></i>
+                            </a>
+                            
+                            <#if favorite.isActivated >
+                                <a class="btn btn-danger btn-sm" href="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?action=toggleActivationFavorite&id=${favorite.id}" title="#i18n{module.mydashboard.favorites.manage_favorites.desactivate}">
+                                    <i class="icon-remove icon-white"></i>
+                                </a>
+                            <#else>
+                                <a class="btn btn-success btn-sm" href="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?action=toggleActivationFavorite&id=${favorite.id}" title="#i18n{module.mydashboard.favorites.manage_favorites.activate}">
+                                    <i class="icon-ok icon-white"></i>
+                                </a>
+                            </#if>
+                            
+                        </td>
+                    </tr>
+                </#list>
+            </@table>
+        <@paginationAdmin paginator=paginator />
   </@boxBody>
 </@rowBox>
-

@@ -47,12 +47,13 @@ import java.util.List;
 public final class FavoriteDAO implements IFavoriteDAO
 {
     // Constants
-    private static final String SQL_QUERY_NEW_PK = "SELECT max( id_favorite ) FROM mydashboard_mydashboard_favorites_favorite";
+    private static final String SQL_QUERY_NEW_PK = "SELECT max( id_favorite ) FROM mydashboard_favorites_favorite";
     private static final String SQL_QUERY_SELECT = "SELECT id_favorite, label, url, is_activated FROM mydashboard_favorites_favorite WHERE id_favorite = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_favorite ( id_favorite, label, url, is_activated ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM mydashboard_favorites_favorite WHERE id_favorite = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_favorite SET id_favorite = ?, label = ?, url = ?, is_activated = ? WHERE id_favorite = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT id_favorite, label, url, is_activated FROM mydashboard_favorites_favorite";
+    private static final String SQL_QUERY_SELECTALL_ACTIVATED = "SELECT id_favorite, label, url, is_activated FROM mydashboard_favorites_favorite WHERE is_activated = 1";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_favorite FROM mydashboard_favorites_favorite";
 
     /**
@@ -140,7 +141,7 @@ public final class FavoriteDAO implements IFavoriteDAO
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
         int nIndex = 1;
-        
+
         daoUtil.setInt( nIndex++ , favorite.getId( ) );
         daoUtil.setString( nIndex++ , favorite.getLabel( ) );
         daoUtil.setString( nIndex++ , favorite.getUrl( ) );
@@ -214,5 +215,31 @@ public final class FavoriteDAO implements IFavoriteDAO
 
         daoUtil.free( );
         return favoriteList;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<Favorite> selectActivatedFavoritesList( Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ACTIVATED, plugin );
+        daoUtil.executeQuery( );
+        List<Favorite> listFavorites = new ArrayList<Favorite>(  );
+
+        while ( daoUtil.next( ) )
+        {
+            Favorite favorite = new Favorite( );
+            int nIndex = 1;
+            
+            favorite.setId( daoUtil.getInt( nIndex++ ) );
+            favorite.setLabel( daoUtil.getString( nIndex++ ) );
+            favorite.setUrl( daoUtil.getString( nIndex++ ) );
+            favorite.setIsActivated( true );
+            listFavorites.add( favorite );
+        }
+
+        daoUtil.free( );
+        return listFavorites; 
     }
 }
