@@ -11,9 +11,9 @@
 
 <!-- Dashboard Component for favorites -->
 <div class="portal">
-    <h2>#i18n{module.mydashboard.favorites.component.favorites.description}</h2>
+    <h2>#i18n{module.mydashboard.favorites.component.description}</h2>
     <p>
-        <a data-target="#myFavorites" data-toggle="modal" href="#" id="myfav" class="btn btn-link">#i18n{module.mydashboard.favorites.component.favorites.modify}</a>
+        <a data-target="#myFavorites" data-toggle="modal" href="#" id="myfav" class="btn btn-link">#i18n{module.mydashboard.favorites.component.modify}</a>
     </p>
         <#list favorites_checked_list?sort_by("label") as favorite>
             <a class="btn btn-info btn-demande" target="_self" href="${favorite.url}">${favorite.label}</a>

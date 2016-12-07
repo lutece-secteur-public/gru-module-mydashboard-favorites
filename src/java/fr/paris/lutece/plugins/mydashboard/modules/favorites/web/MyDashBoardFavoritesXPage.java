@@ -39,11 +39,14 @@ import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
 import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
 import fr.paris.lutece.portal.web.xpages.XPage;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,6 +57,9 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
     
     //Actions
     private static final String ACTION_MODIFY_FAVORITES = "modify_favorites";
+    
+    //Encoding
+    private static final String ENCODING_DEFAULT = "lutece.encoding.url";
     
     //Parameters
     private static final String PARAMETER_FAVORITES = "favorites";
@@ -66,7 +72,15 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
     public XPage modifyFavorites( HttpServletRequest request )
     {
         String[] listFavoritesCheckedId = request.getParameterValues( PARAMETER_FAVORITES );
-        String strRedirectUrl = request.getParameter( PARAMETER_REDIRECT_URL );
+        String strRedirectUrl = null;
+        try
+        {
+            strRedirectUrl = URLDecoder.decode( request.getParameter( PARAMETER_REDIRECT_URL ), AppPropertiesService.getProperty( ENCODING_DEFAULT ) );
+        }
+        catch(UnsupportedEncodingException e)
+        {
+            AppLogService.error( "Unsupported Encoding for decoding "+ PARAMETER_REDIRECT_URL );
+        }
         
         //First remove all the favorites subscriptions for the register Lutece user
         LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
