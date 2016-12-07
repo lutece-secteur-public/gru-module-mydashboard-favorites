@@ -50,6 +50,7 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
 import fr.paris.lutece.plugins.subscribe.business.Subscription;
 import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
+import fr.paris.lutece.portal.service.html.EncodingService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public class MyDashboardFavoritesComponent extends MyDashboardComponent
 
         model.put( MARK_FAVORITES_CHECKED_LIST, listFavoritesSuscribed );
         model.put( MARK_FAVORITES_LIST , FavoriteService.getInstance( ).findAllActivatedFavorites( ) );
-        model.put( MARK_REDIRECT_URL, UrlUtil.getFullUrl( request ) );
+        model.put( MARK_REDIRECT_URL, EncodingService.encodeUrl( UrlUtil.getFullUrl( request ) ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DASHBOARD_COMPONENT, LocaleService.getDefault( ), model );
 
