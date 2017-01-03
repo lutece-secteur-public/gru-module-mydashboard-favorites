@@ -35,6 +35,9 @@ package fr.paris.lutece.plugins.mydashboard.modules.favorites.service;
 
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHome;
+import fr.paris.lutece.plugins.subscribe.business.Subscription;
+import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
+import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
 import java.util.List;
 
 /**
@@ -93,5 +96,23 @@ public class FavoriteService {
     public List<Favorite> findAllActivatedFavorites( )
     {
         return FavoriteHome.getActivatedFavoritesList( );
+    }
+    
+    /**
+     * Remove favorite with specific id, and delete all the users subscription to that favorite
+     * @param nIdFavorite the id of the favorite to delete
+     */
+    public void removeFavorite( int nIdFavorite )
+    {
+        //Remove all the subscription to the favorite the user want to delete
+        SubscriptionFilter filter = new SubscriptionFilter( );
+        filter.setIdSubscribedResource( Integer.toString( nIdFavorite ) );
+        List<Subscription> listSubscription = SubscriptionService.getInstance( ).findByFilter( filter );
+        for ( Subscription subscription : listSubscription )
+        {
+            SubscriptionService.getInstance( ).removeSubscription( subscription, false );
+        }
+        //Remove the favorite 
+        FavoriteHome.remove( nIdFavorite );
     }
 }

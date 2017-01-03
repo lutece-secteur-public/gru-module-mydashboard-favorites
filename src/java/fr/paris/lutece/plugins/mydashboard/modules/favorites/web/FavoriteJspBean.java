@@ -192,7 +192,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     public String doRemoveFavorite( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );
-        FavoriteHome.remove( nId );
+        FavoriteService.getInstance( ).removeFavorite( nId );
         addInfo( INFO_FAVORITE_REMOVED, getLocale(  ) );
 
         return redirectView( request, VIEW_MANAGE_FAVORITES );
