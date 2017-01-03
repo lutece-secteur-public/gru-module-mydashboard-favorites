@@ -36,18 +36,14 @@ package fr.paris.lutece.plugins.mydashboard.modules.favorites.web;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHome;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
-import fr.paris.lutece.plugins.mydashboard.service.IMyDashboardComponent;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.provider.ProviderFavoriteService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
-import fr.paris.lutece.portal.service.plugin.PluginEvent;
-import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.url.UrlItem;
+import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
@@ -63,9 +59,11 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String TEMPLATE_MANAGE_FAVORITES = "/admin/plugins/mydashboard/modules/favorites/manage_favorites.html";
     private static final String TEMPLATE_CREATE_FAVORITE = "/admin/plugins/mydashboard/modules/favorites/create_favorite.html";
     private static final String TEMPLATE_MODIFY_FAVORITE = "/admin/plugins/mydashboard/modules/favorites/modify_favorite.html";
+    private static final String TEMPLATE_IMPORT_FAVORITES = "/admin/plugins/mydashboard/modules/favorites/import_favorites.html";
 
     // Parameters
     private static final String PARAMETER_ID_FAVORITE = "id";
+    private static final String PARAMETER_IMPORT_FAVORITES = "import_favorites";
 
     // Properties for page titles
     private static final String PROPERTY_PAGE_TITLE_MANAGE_FAVORITES = "module.mydashboard.favorites.manage_favorites.pageTitle";
@@ -75,6 +73,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     // Markers
     private static final String MARK_FAVORITE_LIST = "favorite_list";
     private static final String MARK_FAVORITE = "favorite";
+    private static final String MARK_IMPORT_FAVORITES = "import_favorites";
 
     private static final String JSP_MANAGE_FAVORITES = "jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp";
     
@@ -88,6 +87,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String VIEW_MANAGE_FAVORITES = "manageFavorites";
     private static final String VIEW_CREATE_FAVORITE = "createFavorite";
     private static final String VIEW_MODIFY_FAVORITE = "modifyFavorite";
+    private static final String VIEW_IMPORT_FAVORITES = "importFavorites";
 
     // Actions
     private static final String ACTION_CREATE_FAVORITE = "createFavorite";
@@ -95,11 +95,15 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String ACTION_REMOVE_FAVORITE = "removeFavorite";
     private static final String ACTION_CONFIRM_REMOVE_FAVORITE = "confirmRemoveFavorite";
     private static final String ACTION_TOGGLE_ACTIVATION_FAVORITE = "toggleActivationFavorite";
+    private static final String ACTION_IMPORT_FAVORITES = "importFavorites";
 
     // Infos
     private static final String INFO_FAVORITE_CREATED = "module.mydashboard.favorites.info.favorite.created";
     private static final String INFO_FAVORITE_UPDATED = "module.mydashboard.favorites.info.favorite.updated";
     private static final String INFO_FAVORITE_REMOVED = "module.mydashboard.favorites.info.favorite.removed";
+    
+    //Separators
+    private static final String SEPARATOR_IDENTIFIER = "_";
     
     // Session variable to store working values
     private Favorite _favorite;
@@ -239,7 +243,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         return redirectView( request, VIEW_MANAGE_FAVORITES );
     }
     
-    /**
+    /**PROPERTY_PAGE_TITLE_MODIFY_FAVORITE
      * Toggle the activation of a favorite
      *
      * @param request The Http request
@@ -254,6 +258,56 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
 
         FavoriteHome.update( favorite );
         addInfo( INFO_FAVORITE_UPDATED, getLocale(  ) );
+
+        return redirectView( request, VIEW_MANAGE_FAVORITES );
+    }
+    
+    /**
+     * Returns the form to import favorites from providers
+     *
+     * @param request The Http request
+     * @return The HTML form to import providers
+     */
+    @View( VIEW_IMPORT_FAVORITES )
+    public String getImportFavorites( HttpServletRequest request )
+    {
+        
+        Map<String, Object> model = getModel(  );
+        model.put( MARK_IMPORT_FAVORITES, ProviderFavoriteService.getFavoritesListFromProviderNewRemoteId( ) );
+
+        return getPage( PROPERTY_PAGE_TITLE_MODIFY_FAVORITE, TEMPLATE_IMPORT_FAVORITES, model );
+    }
+    
+    /**
+     * Process the import of the favorites
+     *
+     * @param request The Http request
+     * @return The Jsp URL of the process result
+     */
+    @Action( ACTION_IMPORT_FAVORITES )
+    public String doImportFavorites( HttpServletRequest request )
+    {
+        String[] listImportFavoritesChecked = request.getParameterValues( PARAMETER_IMPORT_FAVORITES );
+        List<Favorite> listFavoritesToImport = new ArrayList<Favorite>( );
+        
+        for ( List<Favorite> listFav : ProviderFavoriteService.getFavoritesListFromProvider( ).values( ) )
+        {
+            for ( Favorite fav : listFav )
+            {
+                for ( String strFavoriteChecked : listImportFavoritesChecked )
+                {
+                    if ( ( fav.getProviderName( ) + SEPARATOR_IDENTIFIER + fav.getLabel( ) ).equals( strFavoriteChecked ) )
+                    {
+                        listFavoritesToImport.add( fav );
+                    }
+                } 
+            }
+        }
+        
+        for ( Favorite fav : listFavoritesToImport )
+        {
+            FavoriteHome.create( fav );
+        }
 
         return redirectView( request, VIEW_MANAGE_FAVORITES );
     }

@@ -134,5 +134,17 @@ public final class FavoriteHome
     {
         return _dao.selectFavoritesReferenceList(_plugin );
     }
+    
+    /**
+     * Return the number of favorite for one id remote and one provider name
+     * @param strProviderName the favorite provider name
+     * @param strRemoteId the favorite remote id
+     * @param plugin the Plugin
+     * @return the number of favorite for one id remote and one provider name
+     */
+    public static int getNumberFavoriteProviderRemoteId( String strProviderName, String strRemoteId )
+    {
+        return _dao.countProviderNameRemoteId( strProviderName, strRemoteId, _plugin );
+    }
 }
 

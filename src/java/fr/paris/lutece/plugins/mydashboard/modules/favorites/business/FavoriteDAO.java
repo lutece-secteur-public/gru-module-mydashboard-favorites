@@ -48,13 +48,15 @@ public final class FavoriteDAO implements IFavoriteDAO
 {
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_favorite ) FROM mydashboard_favorites_favorite";
-    private static final String SQL_QUERY_SELECT = "SELECT id_favorite, label, url, is_activated FROM mydashboard_favorites_favorite WHERE id_favorite = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_favorite ( id_favorite, label, url, is_activated ) VALUES ( ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote FROM mydashboard_favorites_favorite WHERE id_favorite = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_favorite ( id_favorite, label, url, is_activated, provider_name, id_remote ) VALUES ( ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM mydashboard_favorites_favorite WHERE id_favorite = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_favorite SET id_favorite = ?, label = ?, url = ?, is_activated = ? WHERE id_favorite = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_favorite, label, url, is_activated FROM mydashboard_favorites_favorite";
-    private static final String SQL_QUERY_SELECTALL_ACTIVATED = "SELECT id_favorite, label, url, is_activated FROM mydashboard_favorites_favorite WHERE is_activated = 1";
+    private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_favorite SET id_favorite = ?, label = ?, url = ?, is_activated = ?, provider_name = ?, id_remote = ? WHERE id_favorite = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote FROM mydashboard_favorites_favorite";
+    private static final String SQL_QUERY_SELECTALL_ACTIVATED = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote FROM mydashboard_favorites_favorite WHERE is_activated = 1";
+    private static final String SQL_QUERY_SELECTALL_PROVIDER_NAME = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote FROM mydashboard_favorites_favorite WHERE provider_name = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_favorite FROM mydashboard_favorites_favorite";
+    private static final String SQL_COUNT_REMOTE_ID_PROVIDER = "SELECT COUNT(id_favorite) FROM mydashboard_favorites_favorite WHERE provider_name = ? AND id_remote = ?";
 
     /**
      * Generates a new primary key
@@ -90,6 +92,8 @@ public final class FavoriteDAO implements IFavoriteDAO
         daoUtil.setString( nIndex++ , favorite.getLabel( ) );
         daoUtil.setString( nIndex++ , favorite.getUrl( ) );
         daoUtil.setBoolean( nIndex++ , favorite.getIsActivated( ) );
+        daoUtil.setString( nIndex++, favorite.getProviderName( ) );
+        daoUtil.setString( nIndex++, favorite.getRemoteId( ) );
 
         daoUtil.executeUpdate( );
         daoUtil.free( );
@@ -115,6 +119,8 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setLabel( daoUtil.getString( nIndex++ ) );
             favorite.setUrl( daoUtil.getString( nIndex++ ) );
             favorite.setIsActivated( daoUtil.getBoolean( nIndex++ ) );
+            favorite.setProviderName(daoUtil.getString( nIndex++ ) );
+            favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
         }
 
         daoUtil.free( );
@@ -146,8 +152,9 @@ public final class FavoriteDAO implements IFavoriteDAO
         daoUtil.setString( nIndex++ , favorite.getLabel( ) );
         daoUtil.setString( nIndex++ , favorite.getUrl( ) );
         daoUtil.setBoolean( nIndex++ , favorite.getIsActivated( ) );
+        daoUtil.setString( nIndex++ , favorite.getProviderName( ) );
+        daoUtil.setString( nIndex++ , favorite.getRemoteId( ) );
         daoUtil.setInt( nIndex , favorite.getId( ) );
-
         daoUtil.executeUpdate( );
         daoUtil.free( );
     }
@@ -171,6 +178,8 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setLabel( daoUtil.getString( nIndex++ ) );
             favorite.setUrl( daoUtil.getString( nIndex++ ) );
             favorite.setIsActivated( daoUtil.getBoolean( nIndex++ ) );
+            favorite.setProviderName( daoUtil.getString( nIndex++ ) );
+            favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
 
             favoriteList.add( favorite );
         }
@@ -236,10 +245,64 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setLabel( daoUtil.getString( nIndex++ ) );
             favorite.setUrl( daoUtil.getString( nIndex++ ) );
             favorite.setIsActivated( true );
+            nIndex++;
+            favorite.setProviderName( daoUtil.getString( nIndex++ ) );
+            favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
             listFavorites.add( favorite );
         }
 
         daoUtil.free( );
         return listFavorites; 
     }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<Favorite> selectProviderNameFavoritesList( String strProviderName, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_PROVIDER_NAME, plugin );
+        daoUtil.setString( 1 , strProviderName );
+        daoUtil.executeQuery( );
+        List<Favorite> listFavorites = new ArrayList<Favorite>();
+
+        while ( daoUtil.next( ) )
+        {
+            Favorite favorite = new Favorite();
+            int nIndex = 1;
+            favorite.setId( daoUtil.getInt( nIndex++ ) );
+            favorite.setLabel( daoUtil.getString( nIndex++ ) );
+            favorite.setUrl( daoUtil.getString( nIndex++ ) );
+            favorite.setIsActivated( daoUtil.getBoolean( nIndex++ ) );
+            favorite.setProviderName(daoUtil.getString( nIndex++ ) );
+            favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
+            listFavorites.add( favorite );
+        }
+
+        daoUtil.free( );
+        return listFavorites; 
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public int countProviderNameRemoteId( String strProviderName, String strRemoteId, Plugin plugin )
+    {
+        int nCountFavoritesRemoteIdProvider = 0;
+        DAOUtil daoUtil = new DAOUtil( SQL_COUNT_REMOTE_ID_PROVIDER, plugin );
+        daoUtil.setString( 1 , strProviderName );
+        daoUtil.setString( 2 , strRemoteId );
+        daoUtil.executeQuery( );
+        if ( daoUtil.next(  ) )
+        {
+            return daoUtil.getInt( 1 );
+        }
+
+        daoUtil.free(  );
+
+        return nCountFavoritesRemoteIdProvider;
+    }
+    
+    
 }

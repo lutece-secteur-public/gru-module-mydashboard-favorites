@@ -1,0 +1,41 @@
+<@rowBox>
+    <@boxHeader i18nTitleKey="module.mydashboard.favorites.import_favorites.title"></@boxHeader>
+    <@boxBody>    
+        <@messages infos=infos />
+            <form action="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp" method="post">
+                <#list import_favorites?keys as provider>
+                    ${provider}
+                    <#assign listFavoriteForProvider = import_favorites[provider] />
+                    <@table>
+                        <tr>
+                            <th>#i18n{module.mydashboard.favorites.import_favorites.label}</th>
+                            <th>#i18n{module.mydashboard.favorites.import_favorites.url}</th>
+                            <th>#i18n{module.mydashboard.favorites.import_favorites.actionImport}</th>
+                        </tr>
+                        <@tableHeadBodySeparator />
+                        <#list listFavoriteForProvider as favorite >
+                            <tr>
+                                <td>
+                                    ${favorite.label}
+                                </td>
+                                <td>
+                                    ${favorite.url}
+                                </td>
+                                <td>
+                                    <label class="checkbox-inline">
+                                        <input name="import_favorites" type="checkbox" value="${favorite.providerName}_${favorite.label}" />
+                                    </label>
+                                </td>
+                            </tr>
+                        </#list>
+                    </@table>
+                </#list>
+
+                <div class="col-xs-12 col-sm-offset-4 col-sm-8">
+                    <button name="action_importFavorites" type="submit" class="btn btn-primary btn-flat">
+                        <i class="fa fa-check"></i> #i18n{module.mydashboard.favorites.import_favorites.importFavorites}
+                    </button>
+                </div>
+        </form>
+    </@boxBody>
+</@rowBox>

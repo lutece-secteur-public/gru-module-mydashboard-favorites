@@ -102,4 +102,21 @@ public interface IFavoriteDAO
      * @return The List which contains the data of all the activated favorite objects
      */
     public List<Favorite> selectActivatedFavoritesList( Plugin plugin );
+    
+    /**
+     * Load the data of all the favorite provided by the ProviderName
+     * @param strProviderName the favorite provider name
+     * @param plugin the Plugin
+     * @return The List which contains the data of all the activated favorite objects
+     */
+    public List<Favorite> selectProviderNameFavoritesList( String strProviderName, Plugin plugin );
+    
+    /**
+     * Count the number of favorite for one provider name AND one remote id (should be 1 or 0)
+     * @param strProviderName the favorite provider name
+     * @param strRemoteId the favorite remote id
+     * @param plugin the Plugin
+     * @return The count of favorites corresponding to provider name and remote id given
+     */
+    public int countProviderNameRemoteId( String strProviderName, String strRemoteId, Plugin plugin );
 }

@@ -56,6 +56,10 @@ public class Favorite implements Serializable
     private String _strUrl;
     
     private boolean _bIsActivated;
+    
+    private String _strProviderName;
+    
+    private String _strRemoteId;
 
     /**
      * Returns the Id
@@ -128,4 +132,44 @@ public class Favorite implements Serializable
     {
         _bIsActivated = bIsActivated;
     }
+
+    /**
+     * Returns the Provider Name
+     * @return The Provider Name
+     */
+    public String getProviderName( )
+    {
+        return _strProviderName;
+    }
+
+    /**
+     * Sets the Provider Name
+     * @param strProviderName The ProviderName
+     */
+    public void setProviderName( String strProviderName )
+    {
+        this._strProviderName = strProviderName;
+    }
+
+    /**
+     * Returns the remote Id of the favorite
+     * @return The Remote Id of the favorite
+     */
+    public String getRemoteId( )
+    {
+        return _strRemoteId;
+    }
+    
+    /**
+     * Set the remote Id of the favorite
+     * @param strRemoteId the remote Id of the favorite
+     */
+    public void setRemoteId( String strRemoteId )
+    {
+        this._strRemoteId = strRemoteId;
+    }
+    
+    
+    
+    
 }
