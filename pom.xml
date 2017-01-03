@@ -51,8 +51,8 @@
     </scm>
 
     <properties>
-        <componentName>favorites</componentName>
-        <jiraProjectName>FAVORITES</jiraProjectName>
-        <jiraComponentId></jiraComponentId>
+        <componentName>Module Mydashboard FAVORITES</componentName>
+        <jiraProjectName>MDFAVORITE</jiraProjectName>
+        <jiraComponentId>13663</jiraComponentId>
     </properties>
 </project>
