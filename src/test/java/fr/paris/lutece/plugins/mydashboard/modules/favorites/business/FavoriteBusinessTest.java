@@ -43,8 +43,13 @@ public class FavoriteBusinessTest extends LuteceTestCase
     private final static String LABEL2 = "Label2";
     private final static String URL1 = "Url1";
     private final static String URL2 = "Url2";
-	private final static boolean ISACTIVATED1 = true;
+    private final static boolean ISACTIVATED1 = true;
     private final static boolean ISACTIVATED2 = false;
+    private final static String PROVIDER_NAME_1 = "PROVIDER_1";
+    private final static String PROVIDER_NAME_2 = "PROVIDER_2";
+    private final static String REMOTE_ID_1 = "1";
+    private final static String REMOTE_ID_2 = "2";
+    
 
     public void testBusiness(  )
     {
@@ -53,6 +58,8 @@ public class FavoriteBusinessTest extends LuteceTestCase
         favorite.setLabel( LABEL1 );
         favorite.setUrl( URL1 );
         favorite.setIsActivated( ISACTIVATED1 );
+        favorite.setProviderName( PROVIDER_NAME_1 );
+        favorite.setRemoteId( REMOTE_ID_1 );
 
         // Create test
         FavoriteHome.create( favorite );
@@ -60,25 +67,29 @@ public class FavoriteBusinessTest extends LuteceTestCase
         assertEquals( favoriteStored.getLabel() , favorite.getLabel( ) );
         assertEquals( favoriteStored.getUrl() , favorite.getUrl( ) );
         assertEquals( favoriteStored.getIsActivated() , favorite.getIsActivated( ) );
+        assertEquals( favoriteStored.getProviderName( ), favorite.getProviderName( ) );
+        assertEquals( favoriteStored.getRemoteId( ) , favorite.getRemoteId( ) );
 
         // Update test
         favorite.setLabel( LABEL2 );
         favorite.setUrl( URL2 );
         favorite.setIsActivated( ISACTIVATED2 );
+        favorite.setProviderName( PROVIDER_NAME_2 );
+        favorite.setRemoteId( REMOTE_ID_2 );
         FavoriteHome.update( favorite );
         favoriteStored = FavoriteHome.findByPrimaryKey( favorite.getId( ) );
         assertEquals( favoriteStored.getLabel() , favorite.getLabel( ) );
         assertEquals( favoriteStored.getUrl() , favorite.getUrl( ) );
         assertEquals( favoriteStored.getIsActivated() , favorite.getIsActivated( ) );
+        assertEquals( favoriteStored.getProviderName( ), favorite.getProviderName( ) );
+        assertEquals( favoriteStored.getRemoteId( ) , favorite.getRemoteId( ) );
 
         // List test
-        FavoriteHome.getFavoritesList();
+        FavoriteHome.getFavoritesList( );
 
         // Delete test
         FavoriteHome.remove( favorite.getId( ) );
         favoriteStored = FavoriteHome.findByPrimaryKey( favorite.getId( ) );
-        assertNull( favoriteStored );
-        
+        assertNull( favoriteStored );   
     }
-
 }
