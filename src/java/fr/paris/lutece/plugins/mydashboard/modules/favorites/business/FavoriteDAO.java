@@ -296,7 +296,7 @@ public final class FavoriteDAO implements IFavoriteDAO
         daoUtil.executeQuery( );
         if ( daoUtil.next(  ) )
         {
-            return daoUtil.getInt( 1 );
+            nCountFavoritesRemoteIdProvider = daoUtil.getInt( 1 );
         }
 
         daoUtil.free(  );
