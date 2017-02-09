@@ -38,7 +38,7 @@
         <dependency>
             <artifactId>plugin-subscribe</artifactId>
             <groupId>fr.paris.lutece.plugins</groupId>
-            <version>[1.0.2-SNAPSHOT,)</version>
+            <version>1.0.1</version>
             <type>lutece-plugin</type>
         </dependency>
     </dependencies>
