@@ -54,6 +54,7 @@ public class MokeFavoriteProvider implements IFavoriteProvider
         fav1.setLabel( "fav1" );
         fav1.setProviderName( FAVORITES_MOKE_PROVIDER_NAME );
         fav1.setRemoteId( "0" );
+        fav1.setIsDefault( false );
         fav1.setUrl( "http://google.fr" );
         
         Favorite fav2 = new Favorite( );
@@ -62,6 +63,7 @@ public class MokeFavoriteProvider implements IFavoriteProvider
         fav2.setLabel( "fav2" );
         fav2.setProviderName( FAVORITES_MOKE_PROVIDER_NAME );
         fav2.setRemoteId( "1" );
+        fav1.setIsDefault( false );
         fav2.setUrl( "http://yahoo.fr" );
         
         listFavorites.add( fav1 );

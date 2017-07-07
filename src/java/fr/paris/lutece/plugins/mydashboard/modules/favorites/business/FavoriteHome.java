@@ -146,5 +146,14 @@ public final class FavoriteHome
     {
         return _dao.countProviderNameRemoteId( strProviderName, strRemoteId, _plugin );
     }
+    
+    /**
+     * Get the default favorites list
+     * @return the default favorites list
+     */
+    public static List<Favorite> getFavoritesListDefault( )
+    {
+        return _dao.selectDefaultFavoritesList( _plugin );
+    }
 }
 

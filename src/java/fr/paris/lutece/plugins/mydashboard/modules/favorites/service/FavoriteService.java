@@ -115,4 +115,13 @@ public class FavoriteService {
         //Remove the favorite 
         FavoriteHome.remove( nIdFavorite );
     }
+    
+    /**
+     * Return default favorite list
+     * @return the default favorite list
+     */
+    public List<Favorite> findAllDefaultFavorites( )
+    {
+        return FavoriteHome.getFavoritesListDefault( );
+    }
 }

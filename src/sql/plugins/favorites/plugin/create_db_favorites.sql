@@ -11,5 +11,6 @@ url varchar(255) default '' NOT NULL,
 is_activated SMALLINT NOT NULL,
 provider_name varchar(255) default '',
 id_remote varchar(255) NULL, 
+is_default SMALLINT NOT NULL default 0,
 PRIMARY KEY (id_favorite)
 );

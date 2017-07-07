@@ -119,4 +119,12 @@ public interface IFavoriteDAO
      * @return The count of favorites corresponding to provider name and remote id given
      */
     public int countProviderNameRemoteId( String strProviderName, String strRemoteId, Plugin plugin );
+    
+    /**
+     * Return the default favorites list
+     * @param plugin
+     * @return the list of default favorites
+     */
+    public List<Favorite> selectDefaultFavoritesList( Plugin plugin );
+    
 }

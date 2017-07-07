@@ -48,15 +48,16 @@ public final class FavoriteDAO implements IFavoriteDAO
 {
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_favorite ) FROM mydashboard_favorites_favorite";
-    private static final String SQL_QUERY_SELECT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote FROM mydashboard_favorites_favorite WHERE id_favorite = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_favorite ( id_favorite, label, url, is_activated, provider_name, id_remote ) VALUES ( ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite WHERE id_favorite = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_favorite ( id_favorite, label, url, is_activated, provider_name, id_remote, is_default ) VALUES ( ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM mydashboard_favorites_favorite WHERE id_favorite = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_favorite SET id_favorite = ?, label = ?, url = ?, is_activated = ?, provider_name = ?, id_remote = ? WHERE id_favorite = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote FROM mydashboard_favorites_favorite";
-    private static final String SQL_QUERY_SELECTALL_ACTIVATED = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote FROM mydashboard_favorites_favorite WHERE is_activated = 1";
-    private static final String SQL_QUERY_SELECTALL_PROVIDER_NAME = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote FROM mydashboard_favorites_favorite WHERE provider_name = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_favorite SET id_favorite = ?, label = ?, url = ?, is_activated = ?, provider_name = ?, id_remote = ?, is_default = ? WHERE id_favorite = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite";
+    private static final String SQL_QUERY_SELECTALL_ACTIVATED = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite WHERE is_activated = 1";
+    private static final String SQL_QUERY_SELECTALL_PROVIDER_NAME = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite WHERE provider_name = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_favorite FROM mydashboard_favorites_favorite";
     private static final String SQL_COUNT_REMOTE_ID_PROVIDER = "SELECT COUNT(id_favorite) FROM mydashboard_favorites_favorite WHERE provider_name = ? AND id_remote = ?";
+    private static final String SQL_QUERY_SELECTALL_DEFAULT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite WHERE is_default = 1";
 
     /**
      * Generates a new primary key
@@ -94,6 +95,7 @@ public final class FavoriteDAO implements IFavoriteDAO
         daoUtil.setBoolean( nIndex++ , favorite.getIsActivated( ) );
         daoUtil.setString( nIndex++, favorite.getProviderName( ) );
         daoUtil.setString( nIndex++, favorite.getRemoteId( ) );
+        daoUtil.setBoolean( nIndex++, favorite.getIsDefault( ) );
 
         daoUtil.executeUpdate( );
         daoUtil.free( );
@@ -121,6 +123,7 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setIsActivated( daoUtil.getBoolean( nIndex++ ) );
             favorite.setProviderName(daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
+            favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
         }
 
         daoUtil.free( );
@@ -154,6 +157,7 @@ public final class FavoriteDAO implements IFavoriteDAO
         daoUtil.setBoolean( nIndex++ , favorite.getIsActivated( ) );
         daoUtil.setString( nIndex++ , favorite.getProviderName( ) );
         daoUtil.setString( nIndex++ , favorite.getRemoteId( ) );
+        daoUtil.setBoolean( nIndex++, favorite.getIsDefault( ) );
         daoUtil.setInt( nIndex , favorite.getId( ) );
         daoUtil.executeUpdate( );
         daoUtil.free( );
@@ -180,6 +184,7 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setIsActivated( daoUtil.getBoolean( nIndex++ ) );
             favorite.setProviderName( daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
+            favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
 
             favoriteList.add( favorite );
         }
@@ -248,6 +253,7 @@ public final class FavoriteDAO implements IFavoriteDAO
             nIndex++;
             favorite.setProviderName( daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
+            favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
             listFavorites.add( favorite );
         }
 
@@ -276,6 +282,7 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setIsActivated( daoUtil.getBoolean( nIndex++ ) );
             favorite.setProviderName(daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
+            favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
             listFavorites.add( favorite );
         }
 
@@ -302,6 +309,34 @@ public final class FavoriteDAO implements IFavoriteDAO
         daoUtil.free(  );
 
         return nCountFavoritesRemoteIdProvider;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<Favorite> selectDefaultFavoritesList( Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_DEFAULT, plugin );
+        daoUtil.executeQuery( );
+        List<Favorite> listFavorites = new ArrayList<Favorite>();
+
+        while ( daoUtil.next( ) )
+        {
+            Favorite favorite = new Favorite();
+            int nIndex = 1;
+            favorite.setId( daoUtil.getInt( nIndex++ ) );
+            favorite.setLabel( daoUtil.getString( nIndex++ ) );
+            favorite.setUrl( daoUtil.getString( nIndex++ ) );
+            favorite.setIsActivated( daoUtil.getBoolean( nIndex++ ) );
+            favorite.setProviderName(daoUtil.getString( nIndex++ ) );
+            favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
+            favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
+            listFavorites.add( favorite );
+        }
+
+        daoUtil.free( );
+        return listFavorites; 
     }
     
     

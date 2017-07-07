@@ -23,6 +23,7 @@
                     <th>#i18n{module.mydashboard.favorites.manage_favorites.columnLabel}</th>
                     <th>#i18n{module.mydashboard.favorites.manage_favorites.columnUrl}</th>
                     <th>#i18n{module.mydashboard.favorites.manage_favorites.columnIsActivated}</th>
+                    <th>#i18n{module.mydashboard.favorites.manage_favorites.columnIsDefault}</th>
                     <th>#i18n{portal.util.labelActions}</th>
                 </tr>
                 <@tableHeadBodySeparator />
@@ -42,6 +43,17 @@
                                 </span>
                             <#else>
                                 <span class="label label-important" title=" #i18n{module.mydashboard.favorites.manage_favorites.desactivated}">
+                                    <i class="fa fa-remove"></i>
+                                </span>
+                            </#if>
+                        </td>
+                        <td>
+                            <#if favorite.isDefault >
+                                <span class="label label-success" title="#i18n{module.mydashboard.favorites.manage_favorites.default}">
+                                    <i class="fa fa-check"></i> 
+                                </span>
+                            <#else>
+                                <span class="label label-important" title=" #i18n{module.mydashboard.favorites.manage_favorites.not_default}">
                                     <i class="fa fa-remove"></i>
                                 </span>
                             </#if>

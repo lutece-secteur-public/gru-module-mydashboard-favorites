@@ -60,6 +60,8 @@ public class Favorite implements Serializable
     private String _strProviderName;
     
     private String _strRemoteId;
+    
+    private boolean _bIsDefault;
 
     /**
      * Returns the Id
@@ -167,6 +169,24 @@ public class Favorite implements Serializable
     public void setRemoteId( String strRemoteId )
     {
         this._strRemoteId = strRemoteId;
+    }
+
+    /**
+     * Return the default boolean
+     * @return true if default, false otherwise
+     */
+    public boolean getIsDefault()
+    {
+        return _bIsDefault;
+    }
+
+    /**
+     * Set the default boolean
+     * @param bIsDefault 
+     */
+    public void setIsDefault( boolean bIsDefault )
+    {
+        _bIsDefault = bIsDefault;
     }
     
     
