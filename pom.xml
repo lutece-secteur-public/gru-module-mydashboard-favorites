@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-mydashboard-favorites</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <name>Lutece mydashboard module favorites</name>
 
     <repositories>
@@ -47,7 +47,7 @@
         <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-mydashboard-favorites.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-module-mydashboard-favorites.git</developerConnection>
         <url>https://github.com/lutece-secteur-public/gru-module-mydashboard-favorites.git</url>
-      <tag>module-mydashboard-favorites-1.0.3</tag>
+      <tag>HEAD</tag>
     </scm>
 
     <properties>
