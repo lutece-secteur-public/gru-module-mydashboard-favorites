@@ -16,7 +16,9 @@
         <a data-target="#myFavorites" data-toggle="modal" href="#" id="myfav" class="btn btn-link">#i18n{module.mydashboard.favorites.component.modify}</a>
     </p>
         <#list favorites_checked_list?sort_by("label") as favorite>
-            <a class="btn btn-info btn-demande" target="_self" href="${favorite.url}">${favorite.label}</a>
+            <div class="favorite_block">
+                <a data-favorite="${favorite.id}" class="btn btn-info btn-demande" target="_self" href="${favorite.url}">${favorite.label} </a><i class="delete_favorite fa fa-trash"></i>
+            </div>
         </#list>
 </div>
 
@@ -48,5 +50,24 @@
   </div>
 </div>
 
+<script>
+$( function(){
+    $('.delete_favorite').on('click', function(event) 
+    {
+        var tagId = $(this).data( "favorite" );
+        var favBlock = $(this).parent(".favorite_block");
 
-
+        $.ajax(
+        {
+            type: 'post',
+            url: 'jsp/site/Portal.jsp?page=favorites&action=delete_favorite',
+            data: 'favorite=' + tagId,
+            success: function( e )
+            {
+               $(favBlock).remove();
+            },
+            dataType : 'json'
+        });
+    });
+});
+</script>

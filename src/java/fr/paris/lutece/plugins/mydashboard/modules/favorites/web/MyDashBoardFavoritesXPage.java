@@ -57,12 +57,14 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
     
     //Actions
     private static final String ACTION_MODIFY_FAVORITES = "modify_favorites";
+    private static final String ACTION_DELETE_FAVORITE = "delete_favorite";
     
     //Encoding
     private static final String ENCODING_DEFAULT = "lutece.encoding.url";
     
     //Parameters
     private static final String PARAMETER_FAVORITES = "favorites";
+    private static final String PARAMETER_FAVORITE = "favorite";
     private static final String PARAMETER_REDIRECT_URL = "redirect_url";
     
     //Subscription key for favorites
@@ -108,5 +110,32 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
         }
         
         return redirect( request, strRedirectUrl );
+    }
+    
+    @Action( ACTION_DELETE_FAVORITE )
+    public XPage deleteFavorite( HttpServletRequest request )
+    {
+        String strIdFavoriteToDelete = request.getParameter( PARAMETER_FAVORITE );
+        
+        //First remove all the favorites subscriptions for the register Lutece user
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+
+        SubscriptionFilter sFilter = new SubscriptionFilter( );
+        sFilter.setIdSubscriber( user.getName( ) );
+        sFilter.setIdSubscribedResource( strIdFavoriteToDelete );
+        sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
+        List<Subscription> listSubscriptionFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter ); 
+        
+        if ( listSubscriptionFavorites.isEmpty() )
+        {
+            return responseJSON( "{\"success\":\"false\",\"message\":\"no favorite found for id " + strIdFavoriteToDelete + "\"}" );
+        }
+        
+        for (Subscription sub : listSubscriptionFavorites)
+        {
+            SubscriptionService.getInstance( ).removeSubscription( sub, false);
+        }
+        
+        return responseJSON( "{\"success\":\"true\",\"message\":\"favorite deleted\"}" );
     }
 }
