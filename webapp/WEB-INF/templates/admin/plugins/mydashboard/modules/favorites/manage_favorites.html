@@ -61,7 +61,7 @@
                         <td>
                             <a href="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?view=modifyFavorite&id=${favorite.id}"
                                class="btn btn-primary btn-sm" title="#i18n{portal.util.labelModify}">
-                                <i class="fa fa-pencil"></i>
+                               <i class="fas fa-edit me-1 mr-1" aria-hidden="true"></i>
                             </a>
 
                             <a href="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?action=confirmRemoveFavorite&id=${favorite.id}"
@@ -71,11 +71,11 @@
                             
                             <#if favorite.isActivated >
                                 <a class="btn btn-danger btn-sm" href="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?action=toggleActivationFavorite&id=${favorite.id}" title="#i18n{module.mydashboard.favorites.manage_favorites.desactivate}">
-                                    <i class="icon-remove icon-white"></i>
+                                    <i class="fas fa-stop me-1 mr-1" aria-hidden="true"></i>
                                 </a>
                             <#else>
                                 <a class="btn btn-success btn-sm" href="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?action=toggleActivationFavorite&id=${favorite.id}" title="#i18n{module.mydashboard.favorites.manage_favorites.activate}">
-                                    <i class="icon-ok icon-white"></i>
+                                    <i class="fas fa-play me-1 mr-1" aria-hidden="true"></i>
                                 </a>
                             </#if>
                             
