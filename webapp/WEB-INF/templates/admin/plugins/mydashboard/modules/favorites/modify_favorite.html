@@ -1,26 +1,26 @@
-<#include "managefavorites_tabs.html" />
-<@tabs tab="favorite" />
-
-<@rowBoxHeader i18nTitleKey="module.mydashboard.favorites.modify_favorite.title">
-    <form class="form-horizontal" method="post" name="modify_favorite" action="jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp">
-        <@messages errors=errors />
-        <input type="hidden" id="id" name="id" value="${favorite.id}"/>
-        <@fieldInputText i18nLabelKey="module.mydashboard.favorites.modify_favorite.labelLabel" inputName="label" mandatory=true value="${favorite.label!''}" i18nHelpBlockKey="module.mydashboard.favorites.modify_favorite.labelLabel.help" />
-        <@fieldInputText i18nLabelKey="module.mydashboard.favorites.modify_favorite.labelUrl" inputName="url" mandatory=true value="${favorite.url!''}" i18nHelpBlockKey="module.mydashboard.favorites.modify_favorite.labelUrl.help" />
-        <div class="form-group">
-            <label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label" for="is_activated">#i18n{module.mydashboard.favorites.modify_favorite.labelIsActivated} :</label>
-            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
-                <input class="" id="is_activated" name="is_activated" type="checkbox" value="true" <#if favorite.isActivated >checked="checked" </#if> />
-                <p class="help-block">#i18n{module.mydashboard.favorites.modify_favorite.labelIsActivated.help}</p>
-            </div>
-	</div>
-        <div class="form-group">
-            <label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label" for="is_default">#i18n{module.mydashboard.favorites.modify_favorite.labelIsDefault} :</label>
-            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
-                <input class="" id="is_default" name="is_default" type="checkbox" value="true" <#if favorite.isDefault >checked="checked" </#if> />
-                <p class="help-block">#i18n{module.mydashboard.favorites.modify_favorite.labelIsDefault.help}</p>
-            </div>
-	</div>
-        <@actionButtons button1Name="action_modifyFavorite" button2Name="view_manageFavorites"/>
-    </form>
-</@rowBoxHeader>
+<@row>
+	<@columns>
+		<@box>
+			<@boxHeader title='#i18n{module.mydashboard.favorites.modify_favorite.title}' />
+			<@boxBody>
+				<@tform method='post' name='modify_favorite' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp'>
+					<@messages errors=errors />
+					<@input type='hidden' id='id' name='id' value='${favorite.id}' />
+					<@formGroup labelFor='label' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelLabel}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelLabel.help}' mandatory=true>
+						<@input type='text' name='label' value='${favorite.label!""}' />
+					</@formGroup>
+					<@formGroup labelFor='url' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelUrl}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelUrl.help}' mandatory=true>
+						<@input type='text' name='url' value='${favorite.url!""}' />
+					</@formGroup>
+					<@formGroup labelFor='is_activated' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelIsActivated}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelIsActivated.help}'>
+						<@checkBox id='is_activated' name='is_activated' value='true' checked=favorite.isActivated />
+					</@formGroup>
+					<@formGroup labelFor='is_default' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelIsDefault}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelIsDefault.help}'>
+						<@checkBox id='is_default' name='is_default' value='true' checked=favorite.isDefault />
+					</@formGroup>
+					<@actionButtons button1Name='action_modifyFavorite' button2Name='view_manageFavorites' />
+				</@tform>
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>
