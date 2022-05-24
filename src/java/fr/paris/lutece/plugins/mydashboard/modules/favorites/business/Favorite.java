@@ -34,6 +34,8 @@
 package fr.paris.lutece.plugins.mydashboard.modules.favorites.business;
 
 import javax.validation.constraints.*;
+import javax.validation.constraints.NotEmpty;
+
 import org.hibernate.validator.constraints.*;
 import java.io.Serializable;
 
