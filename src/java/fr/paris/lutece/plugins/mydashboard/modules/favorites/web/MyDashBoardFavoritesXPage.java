@@ -58,7 +58,8 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
     //Actions
     private static final String ACTION_MODIFY_FAVORITES = "modify_favorites";
     private static final String ACTION_DELETE_FAVORITE = "delete_favorite";
-    
+    private static final String ACTION_ADD_FAVORITE = "add_favorite";
+   
     //Encoding
     private static final String ENCODING_DEFAULT = "lutece.encoding.url";
     
@@ -110,6 +111,36 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
         }
         
         return redirect( request, strRedirectUrl );
+    }
+    
+    @Action( ACTION_ADD_FAVORITE )
+    public XPage doAddFavorite( HttpServletRequest request )
+    {
+        String strIdFavorite = request.getParameter( PARAMETER_FAVORITE );
+        
+        //First remove all the favorites subscriptions for the register Lutece user
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+
+        SubscriptionFilter sFilter = new SubscriptionFilter( );
+        sFilter.setIdSubscriber( user.getName( ) );
+        sFilter.setIdSubscribedResource( strIdFavorite );
+        sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
+        List<Subscription> listSubscriptionFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter ); 
+        
+        if ( listSubscriptionFavorites.isEmpty() )
+        {
+            Subscription sub = new Subscription( );
+            sub.setIdSubscribedResource( strIdFavorite );
+            sub.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
+            sub.setSubscriptionKey( SUBSCRIPTION_KEY );
+            SubscriptionService.getInstance( ).createSubscription( sub, user );
+            
+            return responseJSON( "{\"success\":\"true\",\"message\":\"favorite added\"}" );
+
+        }
+        
+        return responseJSON( "{\"success\":\"false\",\"message\":\"favorite exist or not found id: " + strIdFavorite + "\"}" );
+
     }
     
     @Action( ACTION_DELETE_FAVORITE )
