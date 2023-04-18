@@ -20,36 +20,13 @@
                 <a data-favorite="${favorite.id}" class="btn btn-info btn-demande" target="_self" href="${favorite.url}">${favorite.label} </a><i class="delete_favorite fa fa-trash"></i>
             </div>
         </#list>
+		<div class="form-group">
+	    	<div class="col-lg-4 col-xs-12">
+				<input class="form-control" id="favorite" placeHolder=" + Ajouter un autre service numérique"></input>
+			</div>
+		</div>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="myFavorites" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog modal-sm" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="myModalLabel">#i18n{module.mydashboard.favorites.add.favorites}</h3>
-      </div>
-      <div class="modal-body">
-        <form class="form" method="post" action="jsp/site/Portal.jsp" >
-            <input type="hidden" name="redirect_url" value="${redirect_url}"/>
-            <input type="hidden" name="page" value="favorites" />
-            <#if favorites_list?has_content>
-               <#list favorites_list?sort_by("label") as favorite>
-                    <p>
-                      <input type="checkbox" value="${favorite.id}" name="favorites" id="favorite_${favorite.id}" <#if isFavoriteChecked( favorites_checked_list,favorite ) >checked="checked" </#if>/>
-                      <label for="favorite_${favorite.id}">${favorite.label}</label>
-                    </p>
-                </#list>
-            </#if>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" name="action_modify_favorites">#i18n{module.mydashboard.favorites.validate.favorites}</button>
-            </div>
-          </form>
-        </div> 
-    </div>
-  </div>
-</div>
-
+<script type="text/javascript" src="js/jquery/plugins/ui/jquery.ui.custom-autocomplete.min.js"></script>
 <script>
 $( function(){
     $('.delete_favorite').on('click', function(event) 
@@ -69,5 +46,36 @@ $( function(){
             dataType : 'json'
         });
     });
+    
+    var availableFavorites = [
+        <#if favorites_list?has_content>
+        <#list favorites_list?sort_by("label") as favorite>
+        	{label:"${favorite.label}", value:"${favorite.id}"},
+        </#list>
+        </#if>
+    ];
+    
+    $( "#favorite" ).autocomplete({
+      source: availableFavorites,
+      select:function(event,ui){
+          $("#favorite").val(ui.item.label);
+          addFavorite(ui.item.value);
+          
+          return false;
+       }
+    });
+    
+    function addFavorite( id ){
+        $.ajax({
+	         type: 'post',
+	         url: 'jsp/site/Portal.jsp?page=favorites&action=add_favorite',
+	         data: 'favorite=' + id,
+	         success: function( data )
+	         {
+	       		window.location.reload();
+	         },
+	         dataType : 'json'
+        });
+    }
 });
 </script>
