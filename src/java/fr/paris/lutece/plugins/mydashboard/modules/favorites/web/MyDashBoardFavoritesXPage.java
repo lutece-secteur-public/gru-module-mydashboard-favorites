@@ -50,6 +50,8 @@ import java.net.URLDecoder;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+
 
 @Controller( xpageName = "favorites" )
 public class MyDashBoardFavoritesXPage extends MVCApplication 
@@ -59,13 +61,15 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
     private static final String ACTION_MODIFY_FAVORITES = "modify_favorites";
     private static final String ACTION_DELETE_FAVORITE = "delete_favorite";
     private static final String ACTION_ADD_FAVORITE = "add_favorite";
-   
+    private static final String ACTION_SET_ORDER_FAVORITE = "set_order";
+    
     //Encoding
     private static final String ENCODING_DEFAULT = "lutece.encoding.url";
     
     //Parameters
     private static final String PARAMETER_FAVORITES = "favorites";
     private static final String PARAMETER_FAVORITE = "favorite";
+    private static final String PARAMETER_NEW_ORDER_FAVORITE = "newOrder";
     private static final String PARAMETER_REDIRECT_URL = "redirect_url";
     
     //Subscription key for favorites
@@ -168,5 +172,93 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
         }
         
         return responseJSON( "{\"success\":\"true\",\"message\":\"favorite deleted\"}" );
+    }
+    
+    @Action( ACTION_SET_ORDER_FAVORITE )
+    public XPage setOrderFavorite ( HttpServletRequest request )
+    {
+        String strIdFavorite = request.getParameter( PARAMETER_FAVORITE );
+        String strNewOrder = request.getParameter( PARAMETER_NEW_ORDER_FAVORITE );
+        
+        if ( StringUtils.isNumeric( strIdFavorite ) && StringUtils.isNumeric( strNewOrder ) )
+        {
+            LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+
+            SubscriptionFilter sFilter = new SubscriptionFilter( );
+            sFilter.setIdSubscriber( user.getName( ) );
+            sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
+            List<Subscription> listSubscriptionFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter ); 
+            
+            if ( listSubscriptionFavorites.isEmpty() )
+            {
+                return responseJSON( "{\"success\":\"false\",\"message\":\"no favorite found for id " + strIdFavorite + "\"}" );
+            }
+            
+            Subscription subToSet = getSubscriptionToSet( strIdFavorite, listSubscriptionFavorites );
+            setOrder( listSubscriptionFavorites, strNewOrder, subToSet );
+           
+            return responseJSON( "{\"success\":\"true\"}" );
+        }
+        
+        return responseJSON( "{\"success\":\"false\"}" );
+
+    }
+    
+    /**
+     * Set order
+     * @param listSubscriptionFavorites
+     * @param strNewOrder
+     * @param subToSet
+     */
+    private void setOrder( List<Subscription> listSubscriptionFavorites, String strNewOrder, Subscription subToSet )
+    {
+        int nNewOrder = Integer.parseInt( strNewOrder );
+        int nOrderInit = 1;
+        for ( Subscription sub : listSubscriptionFavorites )
+        {
+            if ( subToSet != null && nNewOrder < subToSet.getOrder( ) 
+                    && sub.getOrder( ) >= nNewOrder && sub.getOrder( ) < subToSet.getOrder( ) )
+            {
+                sub.setOrder( sub.getOrder( ) + 1 );
+                SubscriptionService.getInstance( ).setSubscription( sub );
+            }
+            else if ( subToSet != null && nNewOrder > subToSet.getOrder( )
+                    && sub.getOrder( ) <= nNewOrder && sub.getOrder( ) > subToSet.getOrder( ))
+            {
+                sub.setOrder( sub.getOrder( ) -1 );
+                SubscriptionService.getInstance( ).setSubscription( sub );
+            }
+            else if ( subToSet != null && subToSet.getOrder( ) == sub.getOrder( ) 
+                    && nOrderInit != nNewOrder)
+            {
+                sub.setOrder( nOrderInit );
+                SubscriptionService.getInstance( ).setSubscription( sub );
+            }
+            nOrderInit++;
+        }
+        
+        if( subToSet != null )
+        {
+            subToSet.setOrder( nNewOrder );
+            SubscriptionService.getInstance( ).setSubscription( subToSet ); 
+        }
+    }
+
+    /**
+     * Get subscription to set
+     * @param strIdFavorite
+     * @param listSubscriptionFavorites
+     * @return
+     */
+    private Subscription getSubscriptionToSet( String strIdFavorite, List<Subscription> listSubscriptionFavorites )
+    {
+        for ( Subscription sub : listSubscriptionFavorites)
+        {
+            if( sub.getIdSubscribedResource( ).equals( strIdFavorite ) )
+            {
+                return sub;
+            }
+        }
+        return null;
     }
 }
