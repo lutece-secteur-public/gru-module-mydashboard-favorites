@@ -86,7 +86,9 @@ public class MyDashboardFavoritesComponent extends MyDashboardComponent
         List<Favorite> listFavoritesSuscribed = new ArrayList( );
         for ( Subscription sub : listFavorites )
         {
-            listFavoritesSuscribed.add( FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) ) );
+            Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
+            favorite.setOrder( sub.getOrder( ) );
+            listFavoritesSuscribed.add( favorite );
         }
 
         model.put( MARK_FAVORITES_CHECKED_LIST, listFavoritesSuscribed );

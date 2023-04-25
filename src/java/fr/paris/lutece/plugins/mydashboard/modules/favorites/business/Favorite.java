@@ -64,6 +64,8 @@ public class Favorite implements Serializable
     private String _strRemoteId;
     
     private boolean _bIsDefault;
+    
+    private int _nOrder;
 
     /**
      * Returns the Id
@@ -190,8 +192,22 @@ public class Favorite implements Serializable
     {
         _bIsDefault = bIsDefault;
     }
-    
-    
-    
+
+    /**
+     * @return the _nOrder
+     */
+    public int getOrder( )
+    {
+        return _nOrder;
+    }
+
+    /**
+     * @param nOrder the _nOrder to set
+     */
+    public void setOrder( int nOrder )
+    {
+        this._nOrder = nOrder;
+    }
+
     
 }
