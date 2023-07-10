@@ -216,23 +216,25 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
         int nOrderInit = 1;
         for ( Subscription sub : listSubscriptionFavorites )
         {
-            if ( subToSet != null && nNewOrder < subToSet.getOrder( ) 
-                    && sub.getOrder( ) >= nNewOrder && sub.getOrder( ) < subToSet.getOrder( ) )
+            if( subToSet != null && !subToSet.getIdSubscribedResource( ).equals( sub.getIdSubscribedResource( ) ) )
             {
-                sub.setOrder( sub.getOrder( ) + 1 );
-                SubscriptionService.getInstance( ).setSubscription( sub );
-            }
-            else if ( subToSet != null && nNewOrder > subToSet.getOrder( )
-                    && sub.getOrder( ) <= nNewOrder && sub.getOrder( ) > subToSet.getOrder( ))
-            {
-                sub.setOrder( sub.getOrder( ) -1 );
-                SubscriptionService.getInstance( ).setSubscription( sub );
-            }
-            else if ( subToSet != null && subToSet.getOrder( ) == sub.getOrder( ) 
-                    && nOrderInit != nNewOrder)
-            {
-                sub.setOrder( nOrderInit );
-                SubscriptionService.getInstance( ).setSubscription( sub );
+                if ( nNewOrder < subToSet.getOrder( ) && sub.getOrder( ) >= nNewOrder 
+                        && sub.getOrder( ) < subToSet.getOrder( ) )
+                {
+                    sub.setOrder( sub.getOrder( ) + 1 );
+                    SubscriptionService.getInstance( ).setSubscription( sub );
+                }
+                else if ( nNewOrder > subToSet.getOrder( ) && sub.getOrder( ) <= nNewOrder 
+                        && sub.getOrder( ) > subToSet.getOrder( ))
+                {
+                    sub.setOrder( sub.getOrder( ) -1 );
+                    SubscriptionService.getInstance( ).setSubscription( sub );
+                }
+                else if ( subToSet.getOrder( ) == sub.getOrder( ) && nOrderInit != nNewOrder)
+                {
+                    sub.setOrder( nOrderInit );
+                    SubscriptionService.getInstance( ).setSubscription( sub );
+                }
             }
             nOrderInit++;
         }
