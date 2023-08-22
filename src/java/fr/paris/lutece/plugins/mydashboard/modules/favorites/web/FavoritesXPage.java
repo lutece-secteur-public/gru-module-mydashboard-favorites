@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.mydashboard.modules.favorites.web;
 
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoritesSubscriptionProviderService;
 import fr.paris.lutece.plugins.subscribe.business.Subscription;
 import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
@@ -42,20 +44,29 @@ import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONObject;
 
 
 @Controller( xpageName = "favorites" )
-public class MyDashBoardFavoritesXPage extends MVCApplication 
+public class FavoritesXPage extends MVCApplication 
 {
+    
+    //View
+    private static final String VIEW_FIRST_FAVORITES = "first_favorites";
     
     //Actions
     private static final String ACTION_MODIFY_FAVORITES = "modify_favorites";
@@ -72,9 +83,18 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
     private static final String PARAMETER_NEW_ORDER_FAVORITE = "newOrder";
     private static final String PARAMETER_REDIRECT_URL = "redirect_url";
     
-    //Subscription key for favorites
-    private static final String SUBSCRIPTION_KEY = "favorite_key";
+    //Properties
+    private static final String PROPERTY_NUMBER_OF_FAVORITES = "favorites.menu.numberOfFavorites.show";
     
+    //Constants
+    private static final String SUBSCRIPTION_KEY = "favorite_key";
+    private static final String FAVORITES_PROVIDER_NAME = "FAVORITES_PROVIDER";
+    private static final String JSON_FAVORITES = "favorites";
+    private static final String JSON_ORDER = "order";
+    private static final String JSON_LABEL = "label";
+    private static final String JSON_URL = "url";
+    
+ 
     @Action( ACTION_MODIFY_FAVORITES )
     public XPage modifyFavorites( HttpServletRequest request )
     {
@@ -202,6 +222,44 @@ public class MyDashBoardFavoritesXPage extends MVCApplication
         
         return responseJSON( "{\"success\":\"false\"}" );
 
+    }
+    
+    @SuppressWarnings( "unchecked" )
+    @View( VIEW_FIRST_FAVORITES )
+    public XPage getFirstFavorites ( HttpServletRequest request  )
+    {
+        JSONObject jsonResponse = new JSONObject( );
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+        
+        if( user != null )
+        {
+            int nNbFavoritesShow = AppPropertiesService.getPropertyInt( PROPERTY_NUMBER_OF_FAVORITES, 4 );
+    
+            SubscriptionFilter sFilter = new SubscriptionFilter( );
+            sFilter.setIdSubscriber( user.getName( ) );
+            sFilter.setSubscriptionProvider( FAVORITES_PROVIDER_NAME );
+                    
+            List<Subscription> listFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter );
+            if( !listFavorites.isEmpty( ) )
+            {
+                listFavorites = listFavorites.stream( ).sorted( Comparator.comparing( Subscription::getOrder ) ).limit( nNbFavoritesShow ).collect( Collectors.toList() );
+                
+                List<JSONObject> jsonFavorites = new ArrayList<>();
+                for ( Subscription sub : listFavorites )
+                {
+                    JSONObject jsonFavorite = new JSONObject( );
+    
+                    Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
+                    jsonFavorite.put( JSON_ORDER, sub.getOrder( ) );
+                    jsonFavorite.put( JSON_LABEL, favorite.getLabel( ) );
+                    jsonFavorite.put( JSON_URL, favorite.getUrl( ) );
+                    
+                    jsonFavorites.add( jsonFavorite );
+                }
+                jsonResponse.put( JSON_FAVORITES, jsonFavorites );               
+            }
+        }
+        return responseJSON( jsonResponse.toJSONString( ) );
     }
     
     /**
