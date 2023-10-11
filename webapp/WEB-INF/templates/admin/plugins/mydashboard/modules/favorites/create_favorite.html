@@ -18,6 +18,12 @@
 					<@formGroup labelFor='is_default' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelIsDefault}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelIsDefault.help}'>
 						<@checkBox id='is_default' name='is_default' value='true' />
 					</@formGroup>
+					<@formGroup labelFor='description' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelDescription}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelDescription.help}'>
+						<@input type='textarea' name='description' value='${favorite.description!""}' />
+					</@formGroup>
+					<@formGroup labelFor='pictogramme' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelPictogramme}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelPictogramme.help}'>
+						<@input type='textarea' name='pictogramme' value='${favorite.pictogramme!""}' />
+					</@formGroup>
 					<@actionButtons button1Name='action_createFavorite' button2Name='view_manageFavorites' />
 				</@tform>
 			</@boxBody>

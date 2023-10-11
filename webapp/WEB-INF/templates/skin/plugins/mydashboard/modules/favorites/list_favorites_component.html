@@ -1,0 +1,14 @@
+<div class="portal">
+	<h2>Mes services favoris</h2>
+	<#if favorites??>
+		<div class="row">
+			<#list favorites as favorite>
+				<div class="col-xs-12 col-md-6">
+					<label>${(favorite.label)!}</label>
+					</br>pictogramme: ${(favorite.pictogramme)!}
+					</br>description: ${(favorite.description)!}
+				</div>
+			</#list>
+		</div>
+	</#if>
+</div>

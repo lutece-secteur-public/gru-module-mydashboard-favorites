@@ -6,6 +6,7 @@
 
     <bean id="favorites.favoriteDAO" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteDAO" />
     <bean id="mydashboard.myDashboardComponentFavorite" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.web.MyDashboardFavoritesComponent" scope="singleton" />
+    <bean id="mydashboard.myDashboardComponentListFavorites" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.web.MyDashboardListFavoritesComponent" scope="singleton" />
     
     <!-- Provider Moke de favoris -->
     <!--<bean id="mydashboard.providerMokeFavorite" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.service.provider.MokeFavoriteProvider" scope="singleton" />-->

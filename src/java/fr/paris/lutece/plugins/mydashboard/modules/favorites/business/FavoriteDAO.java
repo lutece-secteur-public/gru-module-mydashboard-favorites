@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (c) 2002-2016, Mairie de Paris
  * All rights reserved.
  *
@@ -48,16 +48,16 @@ public final class FavoriteDAO implements IFavoriteDAO
 {
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_favorite ) FROM mydashboard_favorites_favorite";
-    private static final String SQL_QUERY_SELECT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite WHERE id_favorite = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_favorite ( id_favorite, label, url, is_activated, provider_name, id_remote, is_default ) VALUES ( ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default, description, pictogramme FROM mydashboard_favorites_favorite WHERE id_favorite = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_favorite ( id_favorite, label, url, is_activated, provider_name, id_remote, is_default, description, pictogramme ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM mydashboard_favorites_favorite WHERE id_favorite = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_favorite SET id_favorite = ?, label = ?, url = ?, is_activated = ?, provider_name = ?, id_remote = ?, is_default = ? WHERE id_favorite = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite";
-    private static final String SQL_QUERY_SELECTALL_ACTIVATED = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite WHERE is_activated = 1";
-    private static final String SQL_QUERY_SELECTALL_PROVIDER_NAME = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite WHERE provider_name = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_favorite SET id_favorite = ?, label = ?, url = ?, is_activated = ?, provider_name = ?, id_remote = ?, is_default = ?, description = ?, pictogramme = ? WHERE id_favorite = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default, description, pictogramme FROM mydashboard_favorites_favorite";
+    private static final String SQL_QUERY_SELECTALL_ACTIVATED = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default, description, pictogramme FROM mydashboard_favorites_favorite WHERE is_activated = 1";
+    private static final String SQL_QUERY_SELECTALL_PROVIDER_NAME = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default, description, pictogramme FROM mydashboard_favorites_favorite WHERE provider_name = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_favorite FROM mydashboard_favorites_favorite";
     private static final String SQL_COUNT_REMOTE_ID_PROVIDER = "SELECT COUNT(id_favorite) FROM mydashboard_favorites_favorite WHERE provider_name = ? AND id_remote = ?";
-    private static final String SQL_QUERY_SELECTALL_DEFAULT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default FROM mydashboard_favorites_favorite WHERE is_default = 1";
+    private static final String SQL_QUERY_SELECTALL_DEFAULT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default, description, pictogramme FROM mydashboard_favorites_favorite WHERE is_default = 1";
 
     /**
      * Generates a new primary key
@@ -96,7 +96,9 @@ public final class FavoriteDAO implements IFavoriteDAO
         daoUtil.setString( nIndex++, favorite.getProviderName( ) );
         daoUtil.setString( nIndex++, favorite.getRemoteId( ) );
         daoUtil.setBoolean( nIndex++, favorite.getIsDefault( ) );
-
+        daoUtil.setString( nIndex++, favorite.getDescription( ) );
+        daoUtil.setString( nIndex++, favorite.getPictogramme( ) );
+        
         daoUtil.executeUpdate( );
         daoUtil.free( );
     }
@@ -124,6 +126,8 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setProviderName(daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
             favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
+            favorite.setDescription( daoUtil.getString( nIndex++ ) );
+            favorite.setPictogramme( daoUtil.getString( nIndex++ ) );
         }
 
         daoUtil.free( );
@@ -158,6 +162,9 @@ public final class FavoriteDAO implements IFavoriteDAO
         daoUtil.setString( nIndex++ , favorite.getProviderName( ) );
         daoUtil.setString( nIndex++ , favorite.getRemoteId( ) );
         daoUtil.setBoolean( nIndex++, favorite.getIsDefault( ) );
+        daoUtil.setString( nIndex++, favorite.getDescription( ) );
+        daoUtil.setString( nIndex++, favorite.getPictogramme( ) );
+        
         daoUtil.setInt( nIndex , favorite.getId( ) );
         daoUtil.executeUpdate( );
         daoUtil.free( );
@@ -185,7 +192,9 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setProviderName( daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
             favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
-
+            favorite.setDescription( daoUtil.getString( nIndex++ ) );
+            favorite.setPictogramme( daoUtil.getString( nIndex++ ) );
+            
             favoriteList.add( favorite );
         }
 
@@ -254,6 +263,9 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setProviderName( daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
             favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
+            favorite.setDescription( daoUtil.getString( nIndex++ ) );
+            favorite.setPictogramme( daoUtil.getString( nIndex++ ) );
+            
             listFavorites.add( favorite );
         }
 
@@ -283,6 +295,9 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setProviderName(daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
             favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
+            favorite.setDescription( daoUtil.getString( nIndex++ ) );
+            favorite.setPictogramme( daoUtil.getString( nIndex++ ) );
+            
             listFavorites.add( favorite );
         }
 
@@ -332,6 +347,9 @@ public final class FavoriteDAO implements IFavoriteDAO
             favorite.setProviderName(daoUtil.getString( nIndex++ ) );
             favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
             favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
+            favorite.setDescription( daoUtil.getString( nIndex++ ) );
+            favorite.setPictogramme( daoUtil.getString( nIndex++ ) );
+            
             listFavorites.add( favorite );
         }
 
