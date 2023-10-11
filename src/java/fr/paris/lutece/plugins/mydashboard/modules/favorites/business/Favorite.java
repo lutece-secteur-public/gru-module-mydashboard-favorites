@@ -66,6 +66,10 @@ public class Favorite implements Serializable
     private boolean _bIsDefault;
     
     private int _nOrder;
+    
+    private String _strDescription;
+    
+    private String _strPictogramme;
 
     /**
      * Returns the Id
@@ -209,5 +213,36 @@ public class Favorite implements Serializable
         this._nOrder = nOrder;
     }
 
-    
+    /**
+     * @return the _strDescription
+     */
+    public String getDescription( )
+    {
+        return _strDescription;
+    }
+
+    /**
+     * @param strDescription the _strDescription to set
+     */
+    public void setDescription( String strDescription )
+    {
+        this._strDescription = strDescription;
+    }
+
+    /**
+     * @return the _strPictogramme
+     */
+    public String getPictogramme( )
+    {
+        return _strPictogramme;
+    }
+
+    /**
+     * @param strPictogramme the _strPictogramme to set
+     */
+    public void setPictogramme( String strPictogramme )
+    {
+        this._strPictogramme = strPictogramme;
+    }
+
 }
