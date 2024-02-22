@@ -1,12 +1,18 @@
 <@row>
 	<@columns>
 		<@box>
-			<@boxHeader title='#i18n{module.mydashboard.favorites.manage_favorites.title}'>
-				<@tform name='manage_favorites' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp'>
-					<@button type='submit' name='view_importFavorites' buttonIcon='download' title='#i18n{module.mydashboard.favorites.manage_favorites.buttonImport}' hideTitle=['xs','sm'] size='sm' />
-					<@button type='submit' name='view_createFavorite' buttonIcon='plus-circle' title='#i18n{module.mydashboard.favorites.manage_favorites.buttonAdd}' hideTitle=['xs','sm'] size='sm' />
-				</@tform>
-			</@boxHeader>
+			<div class="card-header">
+				<h3 class="card-title">#i18n{module.mydashboard.favorites.manage_favorites.title}</h3>
+				<div class="ms-auto d-flex">
+					<@tform name='manage_favorites' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp'>
+						<@button type='submit' name='view_importFavorites' buttonIcon='download' title='#i18n{module.mydashboard.favorites.manage_favorites.buttonImport}' hideTitle=['xs','sm'] size='sm' />
+						<@button type='submit' name='view_createFavorite' buttonIcon='plus-circle' title='#i18n{module.mydashboard.favorites.manage_favorites.buttonAdd}' hideTitle=['xs','sm'] size='sm' />
+					</@tform>
+					<@tform name='manage_categories' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>
+						<@button type='submit' name='view_manageCategories' buttonIcon='plus-circle' title='#i18n{module.mydashboard.favorites.manage_categories.buttonManage}' hideTitle=['xs','sm'] size='sm' />
+					</@tform>
+				</div>
+			</div>
 			<@boxBody>    
 				<@messages infos=infos />
 				<@paginationAdmin paginator=paginator combo=1 />
@@ -15,6 +21,7 @@
 						<@input type='hidden' id='id' name='id' />
 						<@th>#i18n{module.mydashboard.favorites.manage_favorites.columnLabel}</@th>
 						<@th>#i18n{module.mydashboard.favorites.manage_favorites.columnUrl}</@th>
+						<@th>#i18n{module.mydashboard.favorites.manage_favorites.columnCategory}</@th>
 						<@th>#i18n{module.mydashboard.favorites.manage_favorites.columnIsActivated}</@th>
 						<@th>#i18n{module.mydashboard.favorites.manage_favorites.columnIsDefault}</@th>
 						<@th>#i18n{portal.util.labelActions}</@th>
@@ -26,8 +33,11 @@
 							<@td md=3>
 								${favorite.label}
 							</@td>
-							<@td md=5>
+							<@td md=4>
 								${favorite.url}
+							</@td>
+							<@td md=2>
+								${favorite.categoryCode!''}
 							</@td>
 							<@td md=1>
 								<#if favorite.isActivated >

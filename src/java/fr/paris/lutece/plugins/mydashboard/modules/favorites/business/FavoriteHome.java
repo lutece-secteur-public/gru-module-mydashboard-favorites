@@ -155,5 +155,15 @@ public final class FavoriteHome
     {
         return _dao.selectDefaultFavoritesList( _plugin );
     }
+    
+    /**
+     * Return the number of favorite for one id remote and one provider name
+     * @param strCategoryCode the category code
+     * @return the List which contains the data of all the favorites filtered by the category code
+     */
+    public static List<Favorite> getFavoritesListByCategoryCode( String strCategoryCode )
+    {
+        return _dao.selectProviderNameFavoritesList( strCategoryCode, _plugin );
+    }
 }
 

@@ -28,6 +28,14 @@
             <feature-url>jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp</feature-url>
             <feature-icon-url/>
       </admin-feature>
+      <admin-feature>
+            <feature-id>CATEGORIES_MANAGEMENT</feature-id>
+            <feature-title>module.mydashboard.favorites.adminFeature.ManageCategories.name</feature-title>
+            <feature-description>module.mydashboard.favorites.adminFeature.ManageCategories.description</feature-description>
+            <feature-level>1</feature-level>
+            <feature-url>jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp</feature-url>
+            <feature-icon-url/>
+      </admin-feature>
     </admin-features>    
 
     <!-- XPages parameters -->

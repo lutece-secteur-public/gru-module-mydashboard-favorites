@@ -70,6 +70,8 @@ public class Favorite implements Serializable
     private String _strDescription;
     
     private String _strPictogramme;
+    
+    private String _strCategoryCode;
 
     /**
      * Returns the Id
@@ -243,6 +245,22 @@ public class Favorite implements Serializable
     public void setPictogramme( String strPictogramme )
     {
         this._strPictogramme = strPictogramme;
+    }
+    
+    /**
+     * @return the _strCategoryCode
+     */
+    public String getCategoryCode( )
+    {
+        return _strCategoryCode;
+    }
+
+    /**
+     * @param strPictogramme the _strCategoryCode to set
+     */
+    public void setCategoryCode( String strCategoryCode )
+    {
+        this._strCategoryCode = strCategoryCode;
     }
 
 }

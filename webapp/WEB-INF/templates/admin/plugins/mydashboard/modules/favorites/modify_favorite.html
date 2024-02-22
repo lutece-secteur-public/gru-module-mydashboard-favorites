@@ -24,6 +24,9 @@
 					<@formGroup labelFor='pictogramme' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelPictogramme}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelPictogramme.help}'>
 						<@input type='textarea' name='pictogramme' value='${favorite.pictogramme!""}' />
 					</@formGroup>
+					<@formGroup labelFor='categoryCode' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelCategoryCode}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelCategoryCode.help}'>
+						<@select name='category_code' items=category_list default_value='${favorite.categoryCode!}' />
+					</@formGroup>
 					<@actionButtons button1Name='action_modifyFavorite' button2Name='view_manageFavorites' />
 				</@tform>
 			</@boxBody>

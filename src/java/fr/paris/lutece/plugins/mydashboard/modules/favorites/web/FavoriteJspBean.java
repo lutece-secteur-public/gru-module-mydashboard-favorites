@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.mydashboard.modules.favorites.web;
 
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Category;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.CategoryHome;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHome;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
@@ -42,6 +44,7 @@ import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.url.UrlItem;
 import java.util.ArrayList;
 
@@ -74,6 +77,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String MARK_FAVORITE_LIST = "favorite_list";
     private static final String MARK_FAVORITE = "favorite";
     private static final String MARK_IMPORT_FAVORITES = "import_favorites";
+    private static final String MARK_CATEGORY_LIST = "category_list";
 
     private static final String JSP_MANAGE_FAVORITES = "jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp";
     
@@ -136,6 +140,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
 
         Map<String, Object> model = getModel(  );
         model.put( MARK_FAVORITE, _favorite );
+        model.put( MARK_CATEGORY_LIST, getCategoryList( ) );
 
         return getPage( PROPERTY_PAGE_TITLE_CREATE_FAVORITE, TEMPLATE_CREATE_FAVORITE, model );
     }
@@ -150,6 +155,11 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     public String doCreateFavorite( HttpServletRequest request )
     {
         populate( _favorite, request );
+        
+        if ( _favorite.getCategoryCode( ).equals( "-1" ) )
+        {
+            _favorite.setCategoryCode( null );
+        }
 
         // Check constraints
         if ( !validateBean( _favorite, VALIDATION_ATTRIBUTES_PREFIX ) )
@@ -216,6 +226,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
 
         Map<String, Object> model = getModel(  );
         model.put( MARK_FAVORITE, _favorite );
+        model.put( MARK_CATEGORY_LIST, getCategoryList( ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_FAVORITE, TEMPLATE_MODIFY_FAVORITE, model );
     }
@@ -230,6 +241,11 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     public String doModifyFavorite( HttpServletRequest request )
     {
         populate( _favorite, request );
+        
+        if ( _favorite.getCategoryCode( ).equals( "-1" ) )
+        {
+            _favorite.setCategoryCode( null );
+        }
 
         // Check constraints
         if ( !validateBean( _favorite, VALIDATION_ATTRIBUTES_PREFIX ) )
@@ -310,5 +326,19 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         }
 
         return redirectView( request, VIEW_MANAGE_FAVORITES );
+    }
+    
+    private ReferenceList getCategoryList( )
+    {
+        ReferenceList referenceList = new ReferenceList( );
+        
+        referenceList.addItem( -1, "-" );
+        
+        for ( Category category : CategoryHome.getCategoriesList( ) )
+        {
+            referenceList.addItem( category.getCode( ), category.getName( ) );
+        }
+        
+        return referenceList;
     }
 }
