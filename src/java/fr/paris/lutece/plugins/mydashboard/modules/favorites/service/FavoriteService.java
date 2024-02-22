@@ -124,4 +124,13 @@ public class FavoriteService {
     {
         return FavoriteHome.getFavoritesListDefault( );
     }
+    
+    /**
+     * Return default favorite list
+     * @return the default favorite list
+     */
+    public List<Favorite> findFavoritesByCategoryCode( String categoryCode )
+    {
+        return FavoriteHome.getFavoritesListByCategoryCode( categoryCode );
+    }
 }

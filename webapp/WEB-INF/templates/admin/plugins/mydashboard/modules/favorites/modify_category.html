@@ -1,0 +1,20 @@
+<@row>
+	<@columns>
+		<@box>
+			<@boxHeader title='#i18n{module.mydashboard.favorites.modify_category.title}' />
+			<@boxBody>
+				<@tform method='post' name='modify_category' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>
+					<@messages errors=errors />
+					<@input type='hidden' id='id' name='id' value='${category.id}' />
+					<@formGroup labelFor='name' labelKey='#i18n{module.mydashboard.favorites.modify_category.labelName}' helpKey='#i18n{module.mydashboard.favorites.modify_category.labelName.help}' mandatory=true>
+						<@input type='text' name='name' value='${category.name!""}' />
+					</@formGroup>
+					<@formGroup labelFor='code' labelKey='#i18n{module.mydashboard.favorites.modify_category.labelUrl}' helpKey='#i18n{module.mydashboard.favorites.modify_category.labelUrl.help}' mandatory=true>
+						<@input type='text' name='code' value='${category.code!""}' />
+					</@formGroup>
+					<@actionButtons button1Name='action_modifyCategory' button2Name='view_manageCategories' />
+				</@tform>
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>

@@ -1,0 +1,40 @@
+<@row>
+	<@columns>
+		<@box>
+			<@boxHeader title='#i18n{module.mydashboard.favorites.manage_categories.title}'>
+				<@tform name='manage_categories' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>
+					<@button type='submit' name='view_createCategory' buttonIcon='plus-circle' title='#i18n{module.mydashboard.favorites.manage_categories.buttonAdd}' hideTitle=['xs','sm'] size='sm' />
+				</@tform>
+			</@boxHeader>
+			<@boxBody>    
+				<@messages infos=infos />
+				<@paginationAdmin paginator=paginator combo=1 />
+				<@table>
+					<@tr>
+						<@input type='hidden' id='id' name='id' />
+						<@th>#i18n{module.mydashboard.favorites.manage_categories.columnName}</@th>
+						<@th>#i18n{module.mydashboard.favorites.manage_categories.columnCode}</@th>
+						<@th>#i18n{portal.util.labelActions}</@th>
+					</@tr>
+					<@tableHeadBodySeparator />
+					<#list category_list as category >
+						<@tr>
+							<@input type='hidden' id='id' name='id' />
+							<@td md=3>
+								${category.name}
+							</@td>
+							<@td md=5>
+								${category.code}
+							</@td>
+							<@td md=2>
+								<@aButton href='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp?view=modifyCategory&id=${category.id}' title='#i18n{portal.util.labelModify}' buttonIcon='edit' size='sm' hideTitle=['all'] />
+								<@aButton href='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp?action=confirmRemoveCategory&id=${category.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' color='danger' size='sm' hideTitle=['all'] />
+							</@td>
+						</@tr>
+					</#list>
+				</@table>
+			<@paginationAdmin paginator=paginator />
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>

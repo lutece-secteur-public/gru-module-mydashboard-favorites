@@ -126,5 +126,13 @@ public interface IFavoriteDAO
      * @return the list of default favorites
      */
     public List<Favorite> selectDefaultFavoritesList( Plugin plugin );
+
+    /**
+     * Load the data of all the favorite provided by the category code
+     * @param strCategoryCode the category code
+     * @param plugin the Plugin
+     * @return The List which contains the data of all the favorites filtered by the category code
+     */
+    List<Favorite> selectCategoryCodeFavoritesList( String strCategoryCode, Plugin plugin );
     
 }
