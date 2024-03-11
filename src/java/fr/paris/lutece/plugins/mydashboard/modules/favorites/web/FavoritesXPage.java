@@ -41,15 +41,12 @@ import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
 import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
 import fr.paris.lutece.portal.web.xpages.XPage;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -69,19 +66,13 @@ public class FavoritesXPage extends MVCApplication
     private static final String VIEW_FIRST_FAVORITES = "first_favorites";
     
     //Actions
-    private static final String ACTION_MODIFY_FAVORITES = "modify_favorites";
     private static final String ACTION_DELETE_FAVORITE = "delete_favorite";
     private static final String ACTION_ADD_FAVORITE = "add_favorite";
     private static final String ACTION_SET_ORDER_FAVORITE = "set_order";
     
-    //Encoding
-    private static final String ENCODING_DEFAULT = "lutece.encoding.url";
-    
     //Parameters
-    private static final String PARAMETER_FAVORITES = "favorites";
     private static final String PARAMETER_FAVORITE = "favorite";
     private static final String PARAMETER_NEW_ORDER_FAVORITE = "newOrder";
-    private static final String PARAMETER_REDIRECT_URL = "redirect_url";
     
     //Properties
     private static final String PROPERTY_NUMBER_OF_FAVORITES = "favorites.menu.numberOfFavorites.show";
@@ -93,49 +84,7 @@ public class FavoritesXPage extends MVCApplication
     private static final String JSON_ORDER = "order";
     private static final String JSON_LABEL = "label";
     private static final String JSON_URL = "url";
-    
- 
-    @Action( ACTION_MODIFY_FAVORITES )
-    public XPage modifyFavorites( HttpServletRequest request )
-    {
-        String[] listFavoritesCheckedId = request.getParameterValues( PARAMETER_FAVORITES );
-        String strRedirectUrl = null;
-        try
-        {
-            strRedirectUrl = URLDecoder.decode( request.getParameter( PARAMETER_REDIRECT_URL ), AppPropertiesService.getProperty( ENCODING_DEFAULT ) );
-        }
-        catch(UnsupportedEncodingException e)
-        {
-            AppLogService.error( "Unsupported Encoding for decoding "+ PARAMETER_REDIRECT_URL );
-        }
-        
-        //First remove all the favorites subscriptions for the register Lutece user
-        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
 
-        SubscriptionFilter sFilter = new SubscriptionFilter( );
-        sFilter.setIdSubscriber( user.getName( ) );
-        sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
-        List<Subscription> listSubscriptionFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter ); 
-        for (Subscription sub : listSubscriptionFavorites)
-        {
-            SubscriptionService.getInstance( ).removeSubscription( sub, false);
-        }
-        
-        //Then subscribe new favorites
-        if ( listFavoritesCheckedId != null )
-        {
-            for (String strFavoriteId : listFavoritesCheckedId)
-            {
-                Subscription sub = new Subscription( );
-                sub.setIdSubscribedResource( strFavoriteId );
-                sub.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
-                sub.setSubscriptionKey( SUBSCRIPTION_KEY );
-                SubscriptionService.getInstance( ).createSubscription( sub, user );
-            }
-        }
-        
-        return redirect( request, strRedirectUrl );
-    }
     
     @Action( ACTION_ADD_FAVORITE )
     public XPage doAddFavorite( HttpServletRequest request )
