@@ -50,4 +50,12 @@
     <!-- Portlet parameters -->
     <portlets>
    </portlets>
+   
+   <!-- Page Includes -->
+    <page-include-services>
+        <page-include-service>
+            <page-include-service-id>favorites</page-include-service-id>
+            <page-include-service-class>fr.paris.lutece.plugins.mydashboard.modules.favorites.web.includes.FavoritesInclude</page-include-service-class>
+        </page-include-service>
+    </page-include-services>
 </plug-in>
