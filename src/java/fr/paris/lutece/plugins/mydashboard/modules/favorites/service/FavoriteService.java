@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.mydashboard.modules.favorites.service;
 
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Category;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.CategoryHome;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHome;
 import fr.paris.lutece.plugins.subscribe.business.Subscription;
@@ -132,5 +134,14 @@ public class FavoriteService {
     public List<Favorite> findFavoritesByCategoryCode( String categoryCode )
     {
         return FavoriteHome.getFavoritesListByCategoryCode( categoryCode );
+    }
+    
+    /**
+     * Return category list
+     * @return the category list
+     */
+    public List<Category> findAllCategories( )
+    {
+        return CategoryHome.getCategoriesList( );
     }
 }
