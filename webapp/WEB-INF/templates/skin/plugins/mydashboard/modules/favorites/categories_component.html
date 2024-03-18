@@ -1,0 +1,49 @@
+<#function isCategoryChecked categories_checked_list category>
+	<#if categories_checked_list?? && categories_checked_list?has_content>
+		<#list categories_checked_list as category_checked>
+			<#if category_checked.id = category.id>
+				<#return true>
+			</#if>
+		</#list>
+	</#if>
+	<#return false>
+</#function>
+<!-- Dashboard Component for categories -->
+<@cSection type='div' class='dashboard-monparis dashboard-categories mt-5'>
+    <@cRow>
+        <@cCol>
+            <@cTitle level=3>#i18n{module.mydashboard.favorites.categories.component.label}</@cTitle>
+            <@cText>Gérez les rubriques sectorielles que vous souhaitez voir affichées.</@cText>
+            <@cRow>
+                <@cCol cols='12 col-md-7' id='category-items'>
+                    <#list categories_list as category>
+                        <@cSection type='div' class='d-flex justify-content-between align-items-center bg-content mb-2 category_block mt-3' params='data-id="${category.id}"'>
+                            ${category.name}
+                            <input type="checkbox" class="category-checkbox" id="category-${category.id}" data-category-id="${category.id}" <#if isCategoryChecked(categories_checked_list, category)>checked</#if>>
+                            <label for="category-${category.id}" class="category-label"></label>
+                        </@cSection>
+                    </#list>
+                </@cCol>
+            </@cRow>
+        </@cCol>
+    </@cRow>
+</@cSection>
+<script src="js/jquery/jquery-3.5.1.min.js"></script>
+<script>
+$(document).ready(function(){
+    $(document).on('change', '.category-checkbox', function(){
+        var categoryId = $(this).data('category-id');
+        if ($(this).is(":checked")) {
+            $.ajax({
+                type: 'GET',
+                url: 'jsp/site/Portal.jsp?page=categories&action=add_category&category=' + categoryId
+            });
+        } else {
+            $.ajax({
+                type: 'GET',
+                url: 'jsp/site/Portal.jsp?page=categories&action=delete_category&category=' + categoryId
+            });
+        }
+    });
+});
+</script>
