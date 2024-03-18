@@ -74,6 +74,9 @@ public class MyDashboardListFavoritesComponent extends MyDashboardComponent
 
     private static final String MARK_FAVORITES = "favorites";
     
+    private static final String PARAMETER_ALL = "all";
+    private static final String PARAMETER_CATEGORY_CODE = "category_code";
+    
     @Override
     public String getDashboardData( HttpServletRequest request )
     {
@@ -92,8 +95,11 @@ public class MyDashboardListFavoritesComponent extends MyDashboardComponent
         for ( Subscription sub : listFavorites )
         {
             Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
-            favorite.setOrder( sub.getOrder( ) );
-            listFavoritesSuscribed.add( favorite );
+            if ( PARAMETER_ALL.equals( request.getParameter( PARAMETER_CATEGORY_CODE ) ) || ( favorite.getCategoryCode( ) != null && favorite.getCategoryCode( ).equals( request.getParameter( PARAMETER_CATEGORY_CODE ) ) ) )
+            {
+                favorite.setOrder( sub.getOrder( ) );
+                listFavoritesSuscribed.add( favorite );
+            }
         }
 
         model.put( MARK_FAVORITES, listFavoritesSuscribed );
