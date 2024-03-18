@@ -45,6 +45,10 @@
             <application-id>favorites</application-id>
             <application-class>fr.paris.lutece.plugins.mydashboard.modules.favorites.web.FavoritesXPage</application-class>
         </application>
+        <application>
+            <application-id>categories</application-id>
+            <application-class>fr.paris.lutece.plugins.mydashboard.modules.favorites.web.CategoriesXPage</application-class>
+        </application>
     </applications>
 
     <!-- Portlet parameters -->
