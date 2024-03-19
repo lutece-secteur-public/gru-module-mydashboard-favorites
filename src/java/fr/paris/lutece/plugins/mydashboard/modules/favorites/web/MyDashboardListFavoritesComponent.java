@@ -75,7 +75,7 @@ public class MyDashboardListFavoritesComponent extends MyDashboardComponent
     private static final String MARK_FAVORITES = "favorites";
     
     private static final String PARAMETER_ALL = "all";
-    private static final String PARAMETER_CATEGORY_CODE = "category_code";
+    private static final String PARAMETER_CATEGORY_CODE = "cat";
     
     @Override
     public String getDashboardData( HttpServletRequest request )
