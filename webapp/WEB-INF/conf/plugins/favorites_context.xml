@@ -12,5 +12,7 @@
     
     <!-- Provider Moke de favoris -->
     <!--<bean id="mydashboard.providerMokeFavorite" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.service.provider.MokeFavoriteProvider" scope="singleton" />-->
-
+	
+	<!-- Service REST -->
+    <bean id="favorites.favoritesRest" class="fr.paris.lutece.plugins.mydashboard.modules.favorites.rest.rs.FavoritesRest" /> 
 </beans>

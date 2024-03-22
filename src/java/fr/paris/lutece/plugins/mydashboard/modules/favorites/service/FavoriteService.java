@@ -40,13 +40,25 @@ import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHo
 import fr.paris.lutece.plugins.subscribe.business.Subscription;
 import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
 import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author alexandre
  */
 public class FavoriteService {
+    
+    private static final String FAVORITES_PROVIDER_NAME = "FAVORITES_PROVIDER";
+    private static final String JSON_FAVORITES = "favorites";
+    private static final String JSON_ORDER = "order";
+    private static final String JSON_LABEL = "label";
+    private static final String JSON_URL = "url";
     
     private  static FavoriteService _instance = null ;
     
@@ -143,5 +155,43 @@ public class FavoriteService {
     public List<Category> findAllCategories( )
     {
         return CategoryHome.getCategoriesList( );
+    }
+    
+    /**
+     * Get user favorites
+     * @param strGuid
+     * @param nbFavoriteToShow
+     * @return json  {favorites:[{"order":1,"label":"test","url":"url"}],[{"order":2,"label":"test2","url":"url"}]}
+     */
+    @SuppressWarnings( "unchecked" )
+    public JSONObject getLastFavoritesJson ( String strGuid, int nNbFavoriteToShow )
+    {
+        JSONObject jsonResponse = new JSONObject( );
+        
+        SubscriptionFilter sFilter = new SubscriptionFilter( );
+        sFilter.setIdSubscriber( strGuid );
+        sFilter.setSubscriptionProvider( FAVORITES_PROVIDER_NAME );
+                
+        List<Subscription> listFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter );
+        if( !listFavorites.isEmpty( ) )
+        {
+            listFavorites = listFavorites.stream( ).sorted( Comparator.comparing( Subscription::getOrder ) ).limit( nNbFavoriteToShow ).collect( Collectors.toList() );
+            
+            List<JSONObject> jsonFavorites = new ArrayList<>();
+            for ( Subscription sub : listFavorites )
+            {
+                JSONObject jsonFavorite = new JSONObject( );
+
+                Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
+                jsonFavorite.put( JSON_ORDER, sub.getOrder( ) );
+                jsonFavorite.put( JSON_LABEL, favorite.getLabel( ) );
+                jsonFavorite.put( JSON_URL, favorite.getUrl( ) );
+                
+                jsonFavorites.add( jsonFavorite );
+            }
+            
+            jsonResponse.put( JSON_FAVORITES, jsonFavorites );               
+        }
+        return jsonResponse;
     }
 }
