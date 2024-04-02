@@ -92,6 +92,7 @@ public class CategoryJspBean extends ManageFavoritesJspBean
     private static final String INFO_CATEGORY_CREATED = "module.mydashboard.favorites.info.category.created";
     private static final String INFO_CATEGORY_UPDATED = "module.mydashboard.favorites.info.category.updated";
     private static final String INFO_CATEGORY_REMOVED = "module.mydashboard.favorites.info.category.removed";
+    private static final String ERROR_CATEGORY_CODE_ALREADY_EXIST = "module.mydashboard.favorites.error.category.code.already.exist";
     
     // Session variable to store working values
     private Category _category;
@@ -142,6 +143,12 @@ public class CategoryJspBean extends ManageFavoritesJspBean
         // Check constraints
         if ( !validateBean( _category, VALIDATION_ATTRIBUTES_PREFIX ) )
         {
+            return redirectView( request, VIEW_CREATE_CATEGORY );
+        }
+        
+        if ( CategoryHome.findByCode( _category.getCode( ) ) != null )
+        {
+            addError( ERROR_CATEGORY_CODE_ALREADY_EXIST, getLocale( ) );
             return redirectView( request, VIEW_CREATE_CATEGORY );
         }
 
@@ -222,6 +229,14 @@ public class CategoryJspBean extends ManageFavoritesJspBean
         // Check constraints
         if ( !validateBean( _category, VALIDATION_ATTRIBUTES_PREFIX ) )
         {
+            return redirect( request, VIEW_MODIFY_CATEGORY, PARAMETER_ID_CATEGORY, _category.getId( ) );
+        }
+        
+        Category cat = CategoryHome.findByCode( _category.getCode( ) );
+        
+        if ( cat != null && cat.getId( ) != _category.getId( ) )
+        {
+            addError( ERROR_CATEGORY_CODE_ALREADY_EXIST, getLocale( ) );
             return redirect( request, VIEW_MODIFY_CATEGORY, PARAMETER_ID_CATEGORY, _category.getId( ) );
         }
 
