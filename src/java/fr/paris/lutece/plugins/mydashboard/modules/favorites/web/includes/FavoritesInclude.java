@@ -40,7 +40,10 @@ public class FavoritesInclude implements PageInclude
                 for ( Subscription sub : listCategories )
                 {
                     Category category = CategoryHome.findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
-                    listCategoriesSuscribed.add( category );
+                    if ( category != null )
+                    {
+                        listCategoriesSuscribed.add( category );
+                    }
                 }
                 
                 rootModel.put( MARK_CATEGORY_LIST, listCategoriesSuscribed );
