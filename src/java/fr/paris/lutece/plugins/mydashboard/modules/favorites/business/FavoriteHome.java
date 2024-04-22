@@ -163,7 +163,7 @@ public final class FavoriteHome
      */
     public static List<Favorite> getFavoritesListByCategoryCode( String strCategoryCode )
     {
-        return _dao.selectProviderNameFavoritesList( strCategoryCode, _plugin );
+        return _dao.selectCategoryCodeFavoritesList( strCategoryCode, _plugin );
     }
 }
 
