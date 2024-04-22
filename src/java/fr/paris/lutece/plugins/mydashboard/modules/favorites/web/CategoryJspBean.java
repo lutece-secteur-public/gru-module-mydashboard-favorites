@@ -35,6 +35,12 @@ package fr.paris.lutece.plugins.mydashboard.modules.favorites.web;
 
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Category;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.CategoryHome;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.CategoriesSubscriptionProviderService;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
+import fr.paris.lutece.plugins.subscribe.business.Subscription;
+import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
+import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
@@ -93,6 +99,7 @@ public class CategoryJspBean extends ManageFavoritesJspBean
     private static final String INFO_CATEGORY_UPDATED = "module.mydashboard.favorites.info.category.updated";
     private static final String INFO_CATEGORY_REMOVED = "module.mydashboard.favorites.info.category.removed";
     private static final String ERROR_CATEGORY_CODE_ALREADY_EXIST = "module.mydashboard.favorites.error.category.code.already.exist";
+    private static final String ERROR_CATEGORY_DELETE_HAS_FAVORITE = "module.mydashboard.favorites.error.category.delete.still.has.favorite";
     
     // Session variable to store working values
     private Category _category;
@@ -187,8 +194,19 @@ public class CategoryJspBean extends ManageFavoritesJspBean
     public String doRemoveCategory( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CATEGORY ) );
-        CategoryHome.remove( nId );
-        addInfo( INFO_CATEGORY_REMOVED, getLocale(  ) );
+        
+        List<Favorite> listFavorite = FavoriteService.getInstance( ).findFavoritesByCategoryCode( CategoryHome.findByPrimaryKey( nId ).getCode( ) );
+        
+        if ( listFavorite != null && !listFavorite.isEmpty( ) )
+        {
+            addError( ERROR_CATEGORY_DELETE_HAS_FAVORITE, getLocale( ) );
+        }
+        else
+        {
+            removeAllCategorySubscriptions( String.valueOf( nId ) );
+            CategoryHome.remove( nId );
+            addInfo( INFO_CATEGORY_REMOVED, getLocale( ) );
+        }
 
         return redirectView( request, VIEW_MANAGE_CATEGORIES );
     }
@@ -244,5 +262,22 @@ public class CategoryJspBean extends ManageFavoritesJspBean
         addInfo( INFO_CATEGORY_UPDATED, getLocale(  ) );
 
         return redirectView( request, VIEW_MANAGE_CATEGORIES );
+    }
+    
+    /**
+     * 
+     * @param strId the id of the category
+     * Remove all the subscriptions attached to the category
+     */
+    private void removeAllCategorySubscriptions( String strId )
+    {
+        SubscriptionFilter sFilter = new SubscriptionFilter( );
+        sFilter.setIdSubscribedResource( strId );
+        sFilter.setSubscriptionProvider( CategoriesSubscriptionProviderService.getInstance( ).getProviderName( ) );
+        List<Subscription> listSubscriptionCategories = SubscriptionService.getInstance( ).findByFilter( sFilter );
+        for ( Subscription sub : listSubscriptionCategories )
+        {
+            SubscriptionService.getInstance( ).removeSubscription( sub, false );
+        }
     }
 }
