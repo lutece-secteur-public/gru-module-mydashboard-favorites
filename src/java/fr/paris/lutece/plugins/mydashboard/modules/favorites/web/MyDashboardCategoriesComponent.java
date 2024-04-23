@@ -103,7 +103,10 @@ public class MyDashboardCategoriesComponent extends MyDashboardComponent
         for ( Subscription sub : listCategories )
         {
             Category category = CategoryHome.findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
-            listCategoriesSuscribed.add( category );
+            if ( category != null )
+            {
+                listCategoriesSuscribed.add( category );
+            }
         }
 
         model.put( MARK_CATEGORIES_CHECKED_LIST, listCategoriesSuscribed );
