@@ -4,7 +4,7 @@
 			<@boxHeader title='#i18n{module.mydashboard.favorites.create_favorite.title}' />
 			<@boxBody>
 				<@messages errors=errors />
-				<@tform name='create_favorite' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp'>
+				<@tform name='create_favorite' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp' params='enctype="multipart/form-data"'>
 					 <@input type='hidden' id='id' name='id' />
 					<@formGroup labelFor='label' labelKey='#i18n{module.mydashboard.favorites.create_favorite.labelLabel}' helpKey='#i18n{module.mydashboard.favorites.create_favorite.labelLabel.help}' mandatory=true>
 						<@input type='text' name='label' value='${favorite.label!""}' />					
@@ -22,7 +22,7 @@
 						<@input type='textarea' name='description' value='${favorite.description!""}' />
 					</@formGroup>
 					<@formGroup labelFor='pictogramme' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelPictogramme}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelPictogramme.help}'>
-						<@input type='textarea' name='pictogramme' value='${favorite.pictogramme!""}' />
+						<@input type='file' id='pictogramme' name='pictogramme'  value='${favorite.pictogramme!\'\'}' tabIndex='1' />
 					</@formGroup>
 					<@formGroup labelFor='categoryCode' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelCategoryCode}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelCategoryCode.help}'>
 						<@select name='category_code' items=category_list default_value='${favorite.categoryCode!}' />

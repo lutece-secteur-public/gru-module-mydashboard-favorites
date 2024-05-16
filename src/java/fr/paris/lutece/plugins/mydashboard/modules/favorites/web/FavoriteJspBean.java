@@ -39,18 +39,26 @@ import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHome;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.provider.ProviderFavoriteService;
+import fr.paris.lutece.portal.service.file.FileService;
+import fr.paris.lutece.portal.service.fileimage.FileImagePublicService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.url.UrlItem;
 import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class provides the user interface to manage Favorite features ( manage, create, modify, remove )
@@ -78,7 +86,8 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String MARK_FAVORITE = "favorite";
     private static final String MARK_IMPORT_FAVORITES = "import_favorites";
     private static final String MARK_CATEGORY_LIST = "category_list";
-
+    private static final String MARK_PICTOGRAMME = "pictogramme";
+    
     private static final String JSP_MANAGE_FAVORITES = "jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp";
     
     // Properties
@@ -100,11 +109,15 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String ACTION_CONFIRM_REMOVE_FAVORITE = "confirmRemoveFavorite";
     private static final String ACTION_TOGGLE_ACTIVATION_FAVORITE = "toggleActivationFavorite";
     private static final String ACTION_IMPORT_FAVORITES = "importFavorites";
-
+    private static final String ACTION_DELETE_PICTOGRAMME = "deletePictogramme";
+    
     // Infos
     private static final String INFO_FAVORITE_CREATED = "module.mydashboard.favorites.info.favorite.created";
     private static final String INFO_FAVORITE_UPDATED = "module.mydashboard.favorites.info.favorite.updated";
     private static final String INFO_FAVORITE_REMOVED = "module.mydashboard.favorites.info.favorite.removed";
+    
+    // Errors
+    private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
     
     //Separators
     private static final String SEPARATOR_IDENTIFIER = "_";
@@ -166,7 +179,15 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         {
             return redirectView( request, VIEW_CREATE_FAVORITE );
         }
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
+        FileItem fileParameterBinaryValue = multipartRequest.getFile( "pictogramme" );
+        FileImagePublicService.init( );
+        if( fileParameterBinaryValue.getSize( ) > 0 )
+        {
+            _favorite.setPictogramme( FileImagePublicService.getInstance( ).addImageResource( fileParameterBinaryValue ));
+        }
+        
         FavoriteHome.create( _favorite );
         addInfo( INFO_FAVORITE_CREATED, getLocale(  ) );
 
@@ -201,8 +222,17 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     @Action( ACTION_REMOVE_FAVORITE )
     public String doRemoveFavorite( HttpServletRequest request )
     {
-        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );       
+        
         FavoriteService.getInstance( ).removeFavorite( nId );
+        
+        Favorite favorite = FavoriteHome.findByPrimaryKey( nId );
+        //Delete file
+        if ( StringUtils.isNumeric( favorite.getPictogramme( ) ) )
+        {
+            FileService.getInstance( ).getFileStoreServiceProvider( ).delete( favorite.getPictogramme( ) );
+        }
+        
         addInfo( INFO_FAVORITE_REMOVED, getLocale(  ) );
 
         return redirectView( request, VIEW_MANAGE_FAVORITES );
@@ -227,6 +257,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         Map<String, Object> model = getModel(  );
         model.put( MARK_FAVORITE, _favorite );
         model.put( MARK_CATEGORY_LIST, getCategoryList( ) );
+        FileImagePublicService.init( );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_FAVORITE, TEMPLATE_MODIFY_FAVORITE, model );
     }
@@ -251,6 +282,20 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         if ( !validateBean( _favorite, VALIDATION_ATTRIBUTES_PREFIX ) )
         {
             return redirect( request, VIEW_MODIFY_FAVORITE, PARAMETER_ID_FAVORITE, _favorite.getId( ) );
+        }
+        
+        //Update File
+        FileImagePublicService.init( );
+        if( StringUtils.isEmpty( _favorite.getPictogramme( ) ) 
+                || FileImagePublicService.getInstance( ).getImageResource( Integer.parseInt( _favorite.getPictogramme( ) ) ) == null  )
+        {
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;   
+            FileItem fileParameterBinaryValue = multipartRequest.getFile( "pictogramme" );
+            
+            if( fileParameterBinaryValue.getSize( ) > 0 )
+            {
+                _favorite.setPictogramme( FileImagePublicService.getInstance( ).addImageResource( fileParameterBinaryValue ) );
+            }
         }
 
         FavoriteHome.update( _favorite );
@@ -340,5 +385,27 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         }
         
         return referenceList;
+    }
+    
+    @Action( ACTION_DELETE_PICTOGRAMME )
+    public String doDeletePictogramme( HttpServletRequest request )
+    {
+        String strIdPictogramme = request.getParameter( MARK_PICTOGRAMME );
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );
+
+        if ( _favorite == null || ( _favorite.getId(  ) != nId ) )
+        {
+            _favorite = FavoriteHome.findByPrimaryKey( nId );
+            if( _favorite == null ) throw new AppException( ERROR_RESOURCE_NOT_FOUND );
+        }
+
+        if ( StringUtils.isNumeric( strIdPictogramme ) )
+        {
+            FileService.getInstance( ).getFileStoreServiceProvider( ).delete( strIdPictogramme );
+            _favorite.setPictogramme( StringUtils.EMPTY );
+            FavoriteHome.update( _favorite );
+        }
+
+        return "{\"status\":\"success\"}";
     }
 }
