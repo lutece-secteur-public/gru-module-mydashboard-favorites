@@ -3,7 +3,7 @@
 		<@box>
 			<@boxHeader title='#i18n{module.mydashboard.favorites.modify_favorite.title}' />
 			<@boxBody>
-				<@tform method='post' name='modify_favorite' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp'>
+				<@tform method='post' name='modify_favorite' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp' params='enctype="multipart/form-data"'>
 					<@messages errors=errors />
 					<@input type='hidden' id='id' name='id' value='${favorite.id}' />
 					<@formGroup labelFor='label' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelLabel}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelLabel.help}' mandatory=true>
@@ -22,7 +22,16 @@
 						<@input type='textarea' name='description' value='${favorite.description!""}' />
 					</@formGroup>
 					<@formGroup labelFor='pictogramme' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelPictogramme}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelPictogramme.help}'>
-						<@input type='textarea' name='pictogramme' value='${favorite.pictogramme!""}' />
+						<@input type='file' id='pictogramme' name='pictogramme'  value='${favorite.pictogramme!""}' />
+						<#if favorite?? && favorite.pictogramme?has_content>
+						<div id="img-picto" class="text-center pt-3" style="height: 120px; width: 120px; background-color: #f6f7fd">
+							<img style="height: 85px;" src="image?id=${(favorite.pictogramme)!}&resource_type=public_image_resource"></img>
+							<button class="btn btn-sm btn-danger" id="delete" title="Supprimer">
+								<i class="ti ti-trash me-1 me-1" aria-hidden="true"></i>
+								<span class="d-none">Supprimer</span>
+							</button>
+						</div>
+						</#if>
 					</@formGroup>
 					<@formGroup labelFor='categoryCode' labelKey='#i18n{module.mydashboard.favorites.modify_favorite.labelCategoryCode}' helpKey='#i18n{module.mydashboard.favorites.modify_favorite.labelCategoryCode.help}'>
 						<@select name='category_code' items=category_list default_value='${favorite.categoryCode!}' />
@@ -33,3 +42,20 @@
 		</@box>
 	</@columns>
 </@row>
+<script>
+$(function(){
+	$('#delete').click(function(){
+
+		var request = $.ajax( { 
+			url : 'jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp?action=deletePictogramme',
+			type : 'POST',
+			data : {pictogramme:'${(favorite.pictogramme)!}',id:'${favorite.id}'},
+			dataType : 'html'
+		} );
+		
+		request.done( function ( content ) { 
+			$( '#img-picto' ).remove();
+		} );
+	});
+});
+</script>
