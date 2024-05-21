@@ -15,17 +15,25 @@
 						<@input type='hidden' id='id' name='id' />
 						<@th>#i18n{module.mydashboard.favorites.manage_categories.columnName}</@th>
 						<@th>#i18n{module.mydashboard.favorites.manage_categories.columnCode}</@th>
+						<@th>#i18n{module.mydashboard.favorites.manage_categories.columnIsDefault}</@th>
 						<@th>#i18n{portal.util.labelActions}</@th>
 					</@tr>
 					<@tableHeadBodySeparator />
 					<#list category_list as category >
 						<@tr>
 							<@input type='hidden' id='id' name='id' />
-							<@td md=3>
+							<@td md=5>
 								${category.name}
 							</@td>
-							<@td md=5>
+							<@td md=2>
 								${category.code}
+							</@td>
+							<@td md=4>
+								<#if category.default>
+									<@tag color='success' title='#i18n{module.mydashboard.favorites.manage_categories.default}' tagIcon='check' />
+								<#else>
+									<@tag color='danger' title='#i18n{module.mydashboard.favorites.manage_categories.not_default}' tagIcon='times' />
+								</#if>
 							</@td>
 							<@td md=2>
 								<@aButton href='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp?view=modifyCategory&id=${category.id}' title='#i18n{portal.util.labelModify}' buttonIcon='edit' size='sm' hideTitle=['all'] />

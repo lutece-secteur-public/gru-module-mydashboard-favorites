@@ -36,8 +36,6 @@
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.util.ReferenceList;
-
 import java.util.List;
 
 /**
@@ -106,6 +104,15 @@ public final class CategoryHome
     public static List<Category> getCategoriesList( )
     {
         return _dao.selectCategoriesList( _plugin );
+    }
+    
+    /**
+     * Get the default favorites list
+     * @return the default favorites list
+     */
+    public static List<Category> getCategoriesListDefault( )
+    {
+        return _dao.selectDefaultCategoriesList( _plugin );
     }
     
     /**

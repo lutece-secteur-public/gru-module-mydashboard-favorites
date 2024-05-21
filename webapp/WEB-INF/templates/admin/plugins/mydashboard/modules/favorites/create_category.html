@@ -12,6 +12,9 @@
 					<@formGroup labelFor='code' labelKey='#i18n{module.mydashboard.favorites.create_category.labelCode}' helpKey='#i18n{module.mydashboard.favorites.create_category.labelCode.help}' mandatory=true>
 						<@input type='text' name='code' value='${category.code!""}' />
 					</@formGroup>
+					<@formGroup labelFor='default' labelKey='#i18n{module.mydashboard.favorites.create_category.labelIsDefault}' helpKey='#i18n{module.mydashboard.favorites.create_category.labelIsDefault.help}'>
+						<@checkBox id='default' name='default' value='true' />
+					</@formGroup>
 					<@actionButtons button1Name='action_createCategory' button2Name='view_manageCategories' />
 				</@tform>
 			</@boxBody>

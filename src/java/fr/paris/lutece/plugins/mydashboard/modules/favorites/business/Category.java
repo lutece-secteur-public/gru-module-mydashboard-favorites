@@ -42,6 +42,7 @@ public class Category implements Serializable
     private int _nId;
     private String _strName;
     private String _strCode;
+    private boolean _isDefault;
     
     /**
      * Returns the Id
@@ -95,5 +96,23 @@ public class Category implements Serializable
     public void setCode( String strCode )
     {
         _strCode = strCode;
+    }
+    
+    /**
+     * Returns the isDefault boolean
+     * @return The isDefault boolean
+     */
+    public boolean isDefault( )
+    {
+        return _isDefault;
+    }
+
+    /**
+     * Sets the isDefault boolean
+     * @param isDefault The isDefault boolean
+     */ 
+    public void setDefault( boolean isDefault )
+    {
+        _isDefault = isDefault;
     }
 }

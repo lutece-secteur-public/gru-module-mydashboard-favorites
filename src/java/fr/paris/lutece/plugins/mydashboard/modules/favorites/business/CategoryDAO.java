@@ -46,12 +46,13 @@ public final class CategoryDAO implements ICategoryDAO
 {
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_category ) FROM mydashboard_favorites_category";
-    private static final String SQL_QUERY_SELECT = "SELECT id_category, name, code FROM mydashboard_favorites_category WHERE id_category = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_category, name, code FROM mydashboard_favorites_category";
+    private static final String SQL_QUERY_SELECT = "SELECT id_category, name, code, is_default FROM mydashboard_favorites_category WHERE id_category = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_category, name, code, is_default FROM mydashboard_favorites_category";
     private static final String SQL_QUERY_SELECT_BY_CODE = SQL_QUERY_SELECTALL + " WHERE code = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_category ( id_category, name, code ) VALUES ( ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECTALL_DEFAULT = SQL_QUERY_SELECTALL + " WHERE is_default = 1";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO mydashboard_favorites_category ( id_category, name, code, is_default ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM mydashboard_favorites_category WHERE id_category = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_category SET id_category = ?, name = ?, code = ? WHERE id_category = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE mydashboard_favorites_category SET id_category = ?, name = ?, code = ?, is_default = ? WHERE id_category = ?";
     
     /**
      * Generates a new primary key
@@ -88,6 +89,7 @@ public final class CategoryDAO implements ICategoryDAO
             daoUtil.setInt( nIndex++ , category.getId( ) );
             daoUtil.setString( nIndex++ , category.getName( ) );
             daoUtil.setString( nIndex++ , category.getCode( ) );
+            daoUtil.setBoolean( nIndex++, category.isDefault( ) );
             
             daoUtil.executeUpdate( );
         }
@@ -113,6 +115,7 @@ public final class CategoryDAO implements ICategoryDAO
                 category.setId( daoUtil.getInt( nIndex++ ) );
                 category.setName( daoUtil.getString( nIndex++ ) );
                 category.setCode( daoUtil.getString( nIndex++ ) );
+                category.setDefault( daoUtil.getBoolean( nIndex++ ) );
             }
             
             return category;
@@ -145,6 +148,7 @@ public final class CategoryDAO implements ICategoryDAO
             daoUtil.setInt( nIndex++ , category.getId( ) );
             daoUtil.setString( nIndex++ , category.getName( ) );
             daoUtil.setString( nIndex++ , category.getCode( ) );
+            daoUtil.setBoolean( nIndex++, category.isDefault( ) );
             
             daoUtil.setInt( nIndex , category.getId( ) );
             daoUtil.executeUpdate( );
@@ -170,6 +174,7 @@ public final class CategoryDAO implements ICategoryDAO
                 category.setId( daoUtil.getInt( nIndex++ ) );
                 category.setName( daoUtil.getString( nIndex++ ) );
                 category.setCode( daoUtil.getString( nIndex++ ) );
+                category.setDefault( daoUtil.getBoolean( nIndex++ ) );
                 
                 categoryList.add( category );
             }
@@ -197,9 +202,35 @@ public final class CategoryDAO implements ICategoryDAO
                 category.setId( daoUtil.getInt( nIndex++ ) );
                 category.setName( daoUtil.getString( nIndex++ ) );
                 category.setCode( daoUtil.getString( nIndex++ ) );
+                category.setDefault( daoUtil.getBoolean( nIndex++ ) );
             }
             
             return category;
         }
+    }
+
+    @Override
+    public List<Category> selectDefaultCategoriesList( Plugin plugin )
+    {
+        List<Category> categoryList = new ArrayList<Category>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_DEFAULT, plugin ) )
+        {
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                Category category = new Category( );
+                int nIndex = 1;
+                
+                category.setId( daoUtil.getInt( nIndex++ ) );
+                category.setName( daoUtil.getString( nIndex++ ) );
+                category.setCode( daoUtil.getString( nIndex++ ) );
+                category.setDefault( daoUtil.getBoolean( nIndex++ ) );
+                
+                categoryList.add( category );
+            }
+        }
+        
+        return categoryList;
     }
 }

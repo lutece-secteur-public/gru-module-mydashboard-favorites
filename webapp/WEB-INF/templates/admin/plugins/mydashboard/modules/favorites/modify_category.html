@@ -9,8 +9,11 @@
 					<@formGroup labelFor='name' labelKey='#i18n{module.mydashboard.favorites.modify_category.labelName}' helpKey='#i18n{module.mydashboard.favorites.modify_category.labelName.help}' mandatory=true>
 						<@input type='text' name='name' value='${category.name!""}' />
 					</@formGroup>
-					<@formGroup labelFor='code' labelKey='#i18n{module.mydashboard.favorites.modify_category.labelUrl}' helpKey='#i18n{module.mydashboard.favorites.modify_category.labelUrl.help}' mandatory=true>
+					<@formGroup labelFor='code' labelKey='#i18n{module.mydashboard.favorites.modify_category.labelCode}' helpKey='#i18n{module.mydashboard.favorites.modify_category.labelCode.help}' mandatory=true>
 						<@input type='text' name='code' value='${category.code!""}' />
+					</@formGroup>
+					<@formGroup labelFor='default' labelKey='#i18n{module.mydashboard.favorites.modify_category.labelIsDefault}' helpKey='#i18n{module.mydashboard.favorites.modify_category.labelIsDefault.help}'>
+						<@checkBox id='default' name='default' value='true' checked=category.default />
 					</@formGroup>
 					<@actionButtons button1Name='action_modifyCategory' button2Name='view_manageCategories' />
 				</@tform>
