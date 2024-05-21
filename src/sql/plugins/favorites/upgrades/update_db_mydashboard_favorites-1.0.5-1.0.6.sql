@@ -6,6 +6,7 @@ CREATE TABLE mydashboard_favorites_category (
 id_category int NOT NULL,
 name varchar(255) default '' NOT NULL,
 code varchar(55) default '' NOT NULL,
+is_default SMALLINT NOT NULL default 0,
 PRIMARY KEY (id_category),
 UNIQUE (code)
 );

@@ -80,4 +80,9 @@ public interface ICategoryDAO
      * {@inheritDoc }
      */
     Category findByCode( String strCode, Plugin plugin );
+
+    /**
+     * {@inheritDoc }
+     */
+    List<Category> selectDefaultCategoriesList( Plugin _plugin );
 }
