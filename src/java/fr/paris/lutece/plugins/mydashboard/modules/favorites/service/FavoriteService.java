@@ -113,6 +113,15 @@ public class FavoriteService {
     }
     
     /**
+     * Load all the activated favorites attached to a category
+     * @return the list of all the activated favorites datas attached to a category.
+     */
+    public List<Favorite> findAllActivatedFavoritesByCode( String strCode )
+    {
+        return FavoriteHome.getActivatedFavoritesListByCode( strCode );
+    }
+    
+    /**
      * Remove favorite with specific id, and delete all the users subscription to that favorite
      * @param nIdFavorite the id of the favorite to delete
      */

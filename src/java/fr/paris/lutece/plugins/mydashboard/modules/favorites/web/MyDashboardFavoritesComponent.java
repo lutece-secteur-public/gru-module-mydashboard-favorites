@@ -45,6 +45,7 @@ import fr.paris.lutece.plugins.mydashboard.modules.favorites.util.UrlUtil;
 import fr.paris.lutece.plugins.mydashboard.service.MyDashboardComponent;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
@@ -68,8 +69,10 @@ public class MyDashboardFavoritesComponent extends MyDashboardComponent
     private static final String MARK_FAVORITES_LIST = "favorites_list";
     private static final String MARK_REDIRECT_URL = "redirect_url";
     
+    private static final String PARAMETER_ALL = "all";
+    private static final String PARAMETER_CATEGORY_CODE = "cat";
     
-    
+    private static final String PROPERTY_NUMBER_OF_FAVORITES_MAX = "favorites.dashboard.number.favorites.max";
 
     @Override
     public String getDashboardData( HttpServletRequest request )  
@@ -81,18 +84,41 @@ public class MyDashboardFavoritesComponent extends MyDashboardComponent
         SubscriptionFilter sFilter = new SubscriptionFilter( );
         sFilter.setIdSubscriber( user.getName( ) );
         sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
-        List<Subscription> listFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter );  
+        List<Subscription> listFavoritesSubscription = SubscriptionService.getInstance( ).findByFilter( sFilter );  
         //get favorites about those subscriptions
-        List<Favorite> listFavoritesSuscribed = new ArrayList( );
-        for ( Subscription sub : listFavorites )
+        List<Favorite> listFavoritesSuscribed = new ArrayList<Favorite>( );
+        String strCategoryCode = request.getParameter( PARAMETER_CATEGORY_CODE );
+        List<Favorite> favoritesList = new ArrayList<Favorite>( );
+        if ( strCategoryCode != null )
         {
-            Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
-            favorite.setOrder( sub.getOrder( ) );
-            listFavoritesSuscribed.add( favorite );
+            if ( PARAMETER_ALL.equals( strCategoryCode ) )
+            {
+                favoritesList = FavoriteService.getInstance( ).findAllActivatedFavorites( );
+            }
+            else
+            {
+                favoritesList = FavoriteService.getInstance( ).findAllActivatedFavoritesByCode( strCategoryCode );
+            }
+        }
+        for ( Subscription sub : listFavoritesSubscription )
+        {
+            for ( Favorite favorite : favoritesList )
+            {
+                if ( String.valueOf( favorite.getId( ) ).equals( sub.getIdSubscribedResource( ) ) && ( PARAMETER_ALL.equals( strCategoryCode ) || ( favorite.getCategoryCode( ) != null && favorite.getCategoryCode( ).equals( strCategoryCode ) ) ) )
+                {
+                    favorite.setOrder( sub.getOrder( ) );
+                    listFavoritesSuscribed.add( favorite );
+                }
+            }
+        }
+        int maxFavorite = AppPropertiesService.getPropertyInt( PROPERTY_NUMBER_OF_FAVORITES_MAX, 6 );
+        if ( listFavoritesSuscribed.size( ) > maxFavorite )
+        {
+            listFavoritesSuscribed = listFavoritesSuscribed.subList( 0, maxFavorite );
         }
 
         model.put( MARK_FAVORITES_CHECKED_LIST, listFavoritesSuscribed );
-        model.put( MARK_FAVORITES_LIST , FavoriteService.getInstance( ).findAllActivatedFavorites( ) );
+        model.put( MARK_FAVORITES_LIST , favoritesList );
         model.put( MARK_REDIRECT_URL, EncodingService.encodeUrl( UrlUtil.getFullUrl( request ) ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DASHBOARD_COMPONENT, LocaleService.getDefault( ), model );

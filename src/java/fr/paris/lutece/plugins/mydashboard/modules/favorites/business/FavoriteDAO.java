@@ -59,6 +59,7 @@ public final class FavoriteDAO implements IFavoriteDAO
     private static final String SQL_COUNT_REMOTE_ID_PROVIDER = "SELECT COUNT(id_favorite) FROM mydashboard_favorites_favorite WHERE provider_name = ? AND id_remote = ?";
     private static final String SQL_QUERY_SELECTALL_DEFAULT = "SELECT id_favorite, label, url, is_activated, provider_name, id_remote, is_default, description, pictogramme, category_code FROM mydashboard_favorites_favorite WHERE is_default = 1";
     private static final String SQL_QUERY_SELECTALL_CATEGORY_CODE = SQL_QUERY_SELECTALL + " WHERE category_code = ?";
+    private static final String SQL_QUERY_SELECTALL_ACTIVATED_CATEGORY_CODE = SQL_QUERY_SELECTALL + " WHERE category_code = ? AND is_activated = 1";
 
     /**
      * Generates a new primary key
@@ -395,6 +396,38 @@ public final class FavoriteDAO implements IFavoriteDAO
     public List<Favorite> selectCategoryCodeFavoritesList( String strCategoryCode, Plugin plugin )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_CATEGORY_CODE, plugin ) )
+        {
+            daoUtil.setString( 1 , strCategoryCode );
+            daoUtil.executeQuery( );
+            List<Favorite> listFavorites = new ArrayList<Favorite>();
+
+            while ( daoUtil.next( ) )
+            {
+                Favorite favorite = new Favorite();
+                int nIndex = 1;
+                favorite.setId( daoUtil.getInt( nIndex++ ) );
+                favorite.setLabel( daoUtil.getString( nIndex++ ) );
+                favorite.setUrl( daoUtil.getString( nIndex++ ) );
+                favorite.setIsActivated( daoUtil.getBoolean( nIndex++ ) );
+                favorite.setProviderName(daoUtil.getString( nIndex++ ) );
+                favorite.setRemoteId( daoUtil.getString( nIndex++ ) );
+                favorite.setIsDefault( daoUtil.getBoolean( nIndex++ ) );
+                favorite.setDescription( daoUtil.getString( nIndex++ ) );
+                favorite.setPictogramme( daoUtil.getString( nIndex++ ) );
+                favorite.setCategoryCode( daoUtil.getString( nIndex++ ) );
+                
+                listFavorites.add( favorite );
+            }
+
+            daoUtil.free( );
+            return listFavorites;
+        } 
+    }
+
+    @Override
+    public List<Favorite> selectCategoryCodeActivatedFavoritesList( String strCategoryCode, Plugin plugin )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ACTIVATED_CATEGORY_CODE, plugin ) )
         {
             daoUtil.setString( 1 , strCategoryCode );
             daoUtil.executeQuery( );

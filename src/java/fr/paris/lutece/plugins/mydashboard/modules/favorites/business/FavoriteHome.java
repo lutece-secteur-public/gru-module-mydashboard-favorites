@@ -165,5 +165,10 @@ public final class FavoriteHome
     {
         return _dao.selectCategoryCodeFavoritesList( strCategoryCode, _plugin );
     }
+
+    public static List<Favorite> getActivatedFavoritesListByCode( String strCategoryCode )
+    {
+        return _dao.selectCategoryCodeActivatedFavoritesList( strCategoryCode, _plugin );
+    }
 }
 

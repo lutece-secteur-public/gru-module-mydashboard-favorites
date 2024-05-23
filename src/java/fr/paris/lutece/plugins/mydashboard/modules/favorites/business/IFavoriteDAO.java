@@ -135,4 +135,6 @@ public interface IFavoriteDAO
      */
     List<Favorite> selectCategoryCodeFavoritesList( String strCategoryCode, Plugin plugin );
     
+    List<Favorite> selectCategoryCodeActivatedFavoritesList( String strCategoryCode, Plugin _plugin );
+    
 }
