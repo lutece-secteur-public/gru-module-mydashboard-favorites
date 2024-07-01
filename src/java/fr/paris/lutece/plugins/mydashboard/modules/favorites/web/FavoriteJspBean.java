@@ -224,14 +224,14 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );       
         
-        FavoriteService.getInstance( ).removeFavorite( nId );
-        
         Favorite favorite = FavoriteHome.findByPrimaryKey( nId );
         //Delete file
         if ( StringUtils.isNumeric( favorite.getPictogramme( ) ) )
         {
             FileService.getInstance( ).getFileStoreServiceProvider( ).delete( favorite.getPictogramme( ) );
         }
+        
+        FavoriteService.getInstance( ).removeFavorite( nId );
         
         addInfo( INFO_FAVORITE_REMOVED, getLocale(  ) );
 
