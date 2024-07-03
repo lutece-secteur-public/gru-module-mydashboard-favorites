@@ -45,7 +45,6 @@ import fr.paris.lutece.plugins.mydashboard.modules.favorites.util.UrlUtil;
 import fr.paris.lutece.plugins.mydashboard.service.MyDashboardComponent;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
@@ -71,8 +70,6 @@ public class MyDashboardFavoritesComponent extends MyDashboardComponent
     
     private static final String PARAMETER_ALL = "all";
     private static final String PARAMETER_CATEGORY_CODE = "cat";
-    
-    private static final String PROPERTY_NUMBER_OF_FAVORITES_MAX = "favorites.dashboard.number.favorites.max";
 
     @Override
     public String getDashboardData( HttpServletRequest request )  
@@ -110,11 +107,6 @@ public class MyDashboardFavoritesComponent extends MyDashboardComponent
                     listFavoritesSuscribed.add( favorite );
                 }
             }
-        }
-        int maxFavorite = AppPropertiesService.getPropertyInt( PROPERTY_NUMBER_OF_FAVORITES_MAX, 6 );
-        if ( listFavoritesSuscribed.size( ) > maxFavorite )
-        {
-            listFavoritesSuscribed = listFavoritesSuscribed.subList( 0, maxFavorite );
         }
 
         model.put( MARK_FAVORITES_CHECKED_LIST, listFavoritesSuscribed );

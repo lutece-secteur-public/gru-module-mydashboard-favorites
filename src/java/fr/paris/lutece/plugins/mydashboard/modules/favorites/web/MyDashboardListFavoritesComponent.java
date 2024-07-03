@@ -52,6 +52,7 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
@@ -71,6 +72,8 @@ public class MyDashboardListFavoritesComponent extends MyDashboardComponent
     private static final String DASHBOARD_COMPONENT_ID = "mydashboard.myDashboardComponentListFavorites";
     private static final String MESSAGE_DASHBOARD_COMPONENT_DESCRIPTION = "module.mydashboard.favorites.component.description.list_favorites";
     private static final String TEMPLATE_DASHBOARD_COMPONENT = "skin/plugins/mydashboard/modules/favorites/list_favorites_component.html";
+    
+    private static final String PROPERTY_NUMBER_OF_FAVORITES_MAX = "favorites.dashboard.number.favorites.max";
 
     private static final String MARK_FAVORITES = "favorites";
     
@@ -100,6 +103,11 @@ public class MyDashboardListFavoritesComponent extends MyDashboardComponent
                 favorite.setOrder( sub.getOrder( ) );
                 listFavoritesSuscribed.add( favorite );
             }
+        }
+        int maxFavorite = AppPropertiesService.getPropertyInt( PROPERTY_NUMBER_OF_FAVORITES_MAX, 6 );
+        if ( listFavoritesSuscribed.size( ) > maxFavorite )
+        {
+            listFavoritesSuscribed = listFavoritesSuscribed.subList( 0, maxFavorite );
         }
 
         model.put( MARK_FAVORITES, listFavoritesSuscribed );
