@@ -17,6 +17,7 @@ import fr.paris.lutece.portal.service.content.PageData;
 import fr.paris.lutece.portal.service.includes.PageInclude;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 public class FavoritesInclude implements PageInclude
 {
@@ -39,10 +40,18 @@ public class FavoritesInclude implements PageInclude
                 List<Category> listCategoriesSuscribed = new ArrayList<Category>( );
                 for ( Subscription sub : listCategories )
                 {
-                    Category category = CategoryHome.findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
-                    if ( category != null )
+                    try
                     {
-                        listCategoriesSuscribed.add( category );
+                        int idCategory = Integer.parseInt( sub.getIdSubscribedResource( ) );
+                        Category category = CategoryHome.findByPrimaryKey( idCategory );
+                        if ( category != null )
+                        {
+                            listCategoriesSuscribed.add( category );
+                        }
+                    }
+                    catch ( NumberFormatException e )
+                    {
+                        AppLogService.error( "Error with category id format for category with id: " + sub.getIdSubscribedResource( ), e );
                     }
                 }
                 

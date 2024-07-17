@@ -57,6 +57,7 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
@@ -102,10 +103,18 @@ public class MyDashboardCategoriesComponent extends MyDashboardComponent
         List<Category> listCategoriesSuscribed = new ArrayList<Category>( );
         for ( Subscription sub : listCategories )
         {
-            Category category = CategoryHome.findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
-            if ( category != null )
+            try
             {
-                listCategoriesSuscribed.add( category );
+                int idCategory = Integer.parseInt( sub.getIdSubscribedResource( ) );
+                Category category = CategoryHome.findByPrimaryKey( idCategory );
+                if ( category != null )
+                {
+                    listCategoriesSuscribed.add( category );
+                }
+            }
+            catch ( NumberFormatException e )
+            {
+                AppLogService.error( "Error with category id format for category with id: " + sub.getIdSubscribedResource( ), e );
             }
         }
 

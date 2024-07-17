@@ -37,6 +37,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Category;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.CategoryHome;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.CategoriesSubscriptionProviderService;
 import fr.paris.lutece.plugins.subscribe.business.Subscription;
 import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
@@ -70,25 +72,29 @@ public class CategoriesXPage extends MVCApplication
     public XPage doAddCategory( HttpServletRequest request )
     {
         String strIdCategory = request.getParameter( PARAMETER_CATEGORY );
+        int idCategory = Integer.parseInt( strIdCategory );
+        Category category = CategoryHome.findByPrimaryKey( idCategory );
         
         LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
-
-        SubscriptionFilter sFilter = new SubscriptionFilter( );
-        sFilter.setIdSubscriber( user.getName( ) );
-        sFilter.setIdSubscribedResource( strIdCategory );
-        sFilter.setSubscriptionProvider( CategoriesSubscriptionProviderService.getInstance( ).getProviderName( ) );
-        List<Subscription> listSubscriptionCategories = SubscriptionService.getInstance( ).findByFilter( sFilter ); 
         
-        if ( listSubscriptionCategories.isEmpty() )
+        if ( category != null )
         {
-            Subscription sub = new Subscription( );
-            sub.setIdSubscribedResource( strIdCategory );
-            sub.setSubscriptionProvider( CategoriesSubscriptionProviderService.getInstance( ).getProviderName( ) );
-            sub.setSubscriptionKey( SUBSCRIPTION_KEY );
-            SubscriptionService.getInstance( ).createSubscription( sub, user );
+            SubscriptionFilter sFilter = new SubscriptionFilter( );
+            sFilter.setIdSubscriber( user.getName( ) );
+            sFilter.setIdSubscribedResource( strIdCategory );
+            sFilter.setSubscriptionProvider( CategoriesSubscriptionProviderService.getInstance( ).getProviderName( ) );
+            List<Subscription> listSubscriptionCategories = SubscriptionService.getInstance( ).findByFilter( sFilter ); 
             
-            return responseJSON( "{\"success\":\"true\",\"message\":\"category added\"}" );
-
+            if ( listSubscriptionCategories.isEmpty() )
+            {
+                Subscription sub = new Subscription( );
+                sub.setIdSubscribedResource( strIdCategory );
+                sub.setSubscriptionProvider( CategoriesSubscriptionProviderService.getInstance( ).getProviderName( ) );
+                sub.setSubscriptionKey( SUBSCRIPTION_KEY );
+                SubscriptionService.getInstance( ).createSubscription( sub, user );
+                
+                return responseJSON( "{\"success\":\"true\",\"message\":\"category added\"}" );
+            }
         }
         
         return responseJSON( "{\"success\":\"false\",\"message\":\"category exist or not found id: " + strIdCategory + "\"}" );
