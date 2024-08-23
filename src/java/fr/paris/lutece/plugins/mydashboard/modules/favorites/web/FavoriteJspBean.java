@@ -40,10 +40,12 @@ import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHo
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.provider.ProviderFavoriteService;
 import fr.paris.lutece.portal.service.file.FileService;
+import fr.paris.lutece.portal.service.file.FileServiceException;
 import fr.paris.lutece.portal.service.fileimage.FileImagePublicService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
@@ -228,7 +230,11 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         //Delete file
         if ( StringUtils.isNumeric( favorite.getPictogramme( ) ) )
         {
-            FileService.getInstance( ).getFileStoreServiceProvider( ).delete( favorite.getPictogramme( ) );
+            try {
+				FileService.getInstance( ).getFileStoreServiceProvider( ).delete( favorite.getPictogramme( ) );
+			} catch (FileServiceException e) {
+				AppLogService.error(e);
+			}
         }
         
         FavoriteService.getInstance( ).removeFavorite( nId );
@@ -401,9 +407,14 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
 
         if ( StringUtils.isNumeric( strIdPictogramme ) )
         {
-            FileService.getInstance( ).getFileStoreServiceProvider( ).delete( strIdPictogramme );
-            _favorite.setPictogramme( StringUtils.EMPTY );
-            FavoriteHome.update( _favorite );
+            try {
+				FileService.getInstance( ).getFileStoreServiceProvider( ).delete( strIdPictogramme );
+				_favorite.setPictogramme( StringUtils.EMPTY );
+				FavoriteHome.update( _favorite );
+			} catch (FileServiceException e) {
+				AppLogService.error(e);
+				return "{\"status\":\"failed\"}";
+			}
         }
 
         return "{\"status\":\"success\"}";
