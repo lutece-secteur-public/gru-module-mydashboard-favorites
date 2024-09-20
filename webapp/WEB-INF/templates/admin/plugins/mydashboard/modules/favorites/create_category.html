@@ -1,11 +1,11 @@
 <@row>
 	<@columns>
-		<@box>
-			<@boxHeader title='#i18n{module.mydashboard.favorites.create_category.title}' />
-			<@boxBody>
-				<@messages errors=errors />
-				<@tform name='create_category' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>
-					 <@input type='hidden' id='id' name='id' />
+		<@tform name='create_category' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>	
+			<@box>
+				<@boxHeader title='#i18n{module.mydashboard.favorites.create_category.title}' />
+				<@boxBody>
+					<@messages errors=errors />
+					<@input type='hidden' id='id' name='id' />
 					<@formGroup labelFor='name' labelKey='#i18n{module.mydashboard.favorites.create_category.labelName}' helpKey='#i18n{module.mydashboard.favorites.create_category.labelName.help}' mandatory=true>
 						<@input type='text' name='name' value='${category.name!""}' />					
 					</@formGroup>
@@ -15,9 +15,108 @@
 					<@formGroup labelFor='default' labelKey='#i18n{module.mydashboard.favorites.create_category.labelIsDefault}' helpKey='#i18n{module.mydashboard.favorites.create_category.labelIsDefault.help}'>
 						<@checkBox id='default' name='default' value='true' />
 					</@formGroup>
+				</@boxBody>
+			</@box>				
+			<@box>
+				<@boxBody>					
+					<@div class="row mb-4">
+						<@div class="col-6">
+							<h4>#i18n{module.mydashboard.favorites.modify_category.labelBindDemandTypeTitle}</h4>
+							<@div class="row mt-3">
+								<@div class="col-8">
+									<@alert color='info'>#i18n{module.mydashboard.favorites.modify_category.association.demand_types.information_msg}</@alert>
+								</@div>
+							</@div>	
+							<@div class="group-demand-type"/>			
+							<@div class="row mt-4">
+								<@div class="col-8">
+									<@input type='hidden' name="idCategory" value='${(category.id)!}' />
+									<@select name="selectDemandType" items=demandTypesWithoutCat default_value='' />
+								</@div>
+								<@div class="col-2">
+									<@button class="btn btn-primary " id="addDemandType">#i18n{module.mydashboard.favorites.modify_category.labelBindButton}</@button>
+								</@div>
+							</@div>
+						</@div>
+						<@div class="col-6">
+							<h4>#i18n{module.mydashboard.favorites.modify_category.labelBindFavorisTitle}</h4>
+							<@div class="row mt-3">
+								<@div class="col-8">
+									<@alert color='info'>#i18n{module.mydashboard.favorites.modify_category.association.favorites.information_msg}</@alert>
+								</@div>
+							</@div>
+							<@div class="group-favorite"/>
+							<@div class="row mt-4">
+								<@div class="col-8">
+									<@input type='hidden' name="idCategory" value='${(category.id)!}' />
+									<@select name="selectFavorite" id="selectFavorite" items=favoritesWithoutCat default_value='' />
+								</@div>
+								<@div class="col-2">
+									<@button class="btn btn-primary" id="addFavorite">#i18n{module.mydashboard.favorites.modify_category.labelBindButton}</@button>
+								</@div>
+							</@div>
+						</@div>
+					</@div>
 					<@actionButtons button1Name='action_createCategory' button2Name='view_manageCategories' />
-				</@tform>
-			</@boxBody>
-		</@box>
+				</@boxBody>
+			</@box>
+		</@tform>
 	</@columns>
 </@row>
+<script>
+$(function(){
+	
+	//Associate favorite
+	$('#addFavorite').click(function(){
+		var value = $('#selectFavorite').val();
+		var title = $('#selectFavorite').find("option:selected").attr("title");
+		$('.group-favorite').prepend(getFavoriteInput(value,title));
+	});
+	
+	//Remove favorite association
+	$('body').on('click','.delete-favorite', function(){
+		var id = $(this).attr("id");
+		$('.favorite-' + id ).remove();
+	});
+	
+	//Get template favorite
+	function getFavoriteInput(id,label ){
+		return `<@div class="row mt-2 favorite-` + id + `">`
+		+ `<@div class="col-8">`
+		+ `<@input type='hidden' name="idFavorite" value='` + id + `'/>`
+		+ `<@input type='text' name="favorite" value='` + label + `' params='disabled' />`
+		+ `</@div>`
+		+ `<@div class="col-2">`
+		+ `<@button class="delete-favorite" id='` + id + `' title="#i18n{portal.util.labelDelete}" buttonIcon="trash" hideTitle=["all"] color="btn btn-danger" />`
+		+ `</@div>`
+		+ `</@div>`;
+	}
+	
+	//Associate demand type
+	$('#addDemandType').click(function(){
+		var value = $('#selectDemandType').val();
+		var title = $('#selectDemandType').find("option:selected").attr("title");
+		$('.group-demand-type').prepend(getDemandTypeInput(value,title));
+	});
+	
+	//Remove demand type association
+	$('body').on('click','.delete-demand-type', function(){
+		var id = $(this).attr("id");
+		$('.demand-type-' + id ).remove();
+	});
+	
+	//Get template demand type
+	function getDemandTypeInput(id,label ){
+		return `<@div class="row mt-2 demand-type-` + id + `">`
+		+ `<@div class="col-8">`
+		+ `<@input type='hidden' name="idDemandType" value='` + id + `'/>`
+		+ `<@input type='text' name="demandType" value='` + label + `' params='disabled' />`
+		+ `</@div>`
+		+ `<@div class="col-2">`
+		+ `<@button class="delete-demand-type" id='` + id + `' title="#i18n{portal.util.labelDelete}" buttonIcon="trash" hideTitle=["all"] color="btn btn-danger" />`
+		+ `</@div>`
+		+ `</@div>`;
+	}
+});
+
+</script>

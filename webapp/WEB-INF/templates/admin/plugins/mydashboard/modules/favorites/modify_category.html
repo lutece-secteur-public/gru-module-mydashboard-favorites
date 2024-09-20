@@ -3,6 +3,8 @@
 		<@box>
 			<@boxHeader title='#i18n{module.mydashboard.favorites.modify_category.title}' />
 			<@boxBody>
+				<@messages infos=infos />
+				<@messages errors=errors />
 				<@tform method='post' name='modify_category' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>
 					<@messages errors=errors />
 					<@input type='hidden' id='id' name='id' value='${category.id}' />
@@ -17,6 +19,84 @@
 					</@formGroup>
 					<@actionButtons button1Name='action_modifyCategory' button2Name='view_manageCategories' />
 				</@tform>
+			</@boxBody>
+		</@box>				
+		<@box>
+			<@boxBody>					
+				<@div class="row">
+					<#if demandTypesWithoutCat?has_content>
+					<@div class="col-6">
+						<@formGroup labelFor='name' labelKey='#i18n{module.mydashboard.favorites.modify_category.labelBindDemandTypeTitle}'>						
+							<@div class="row">
+								<@div class="col-8">
+									<@alert color='info'>#i18n{module.mydashboard.favorites.modify_category.association.demand_types.information_msg}</@alert>
+								</@div>
+							</@div>	
+							<#if demandTypesAssociated?has_content>						
+							<#list demandTypesAssociated as demandType>
+							<@tform method='post' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>							
+								<@div class="row mt-2">
+									<@div class="col-8">
+										<@input type='hidden' name="idDemandType" value='${(demandType.code)!}' />
+										<@input type='text' name="demandType" value='${(demandType.name)!}' tabIndex='0' params='disabled' />
+									</@div>
+									<@div class="col-2">
+										<@button type="submit" name="action_confirmRemoveAssociatedDemandType"  class="delete-demandType" id="${(demandType.code)!}" title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn btn-danger' />
+									</@div>
+								</@div>
+							</@tform>
+							</#list>
+							</#if>
+							<@tform method='post' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>							
+							<@div class="row mt-4">
+								<@div class="col-8">
+									<@input type='hidden' name="idCategory" value='${(category.id)!}' />
+									<@select name="idDemandType" items=demandTypesWithoutCat default_value='' />
+								</@div>
+								<@div class="col-2">
+									<@button type="submit" name="action_associateDemandTypeCategory" class="btn btn-primary " id="addDemandType">#i18n{module.mydashboard.favorites.modify_category.labelBindButton}</@button>
+								</@div>
+							</@div>
+							</@tform>
+						</@formGroup>
+					</@div>
+					</#if>
+					<@div class="col-6">
+						<@formGroup labelFor='name' labelKey='#i18n{module.mydashboard.favorites.modify_category.labelBindFavorisTitle}'>						
+							<@div class="row">
+								<@div class="col-8">
+									<@alert color='info'>#i18n{module.mydashboard.favorites.modify_category.association.favorites.information_msg}</@alert>
+								</@div>
+							</@div>							
+							<#if favoritesAssociated?has_content>
+							<#list favoritesAssociated as favorite>
+							<@tform method='post' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>							
+								<@div class="row mt-2">
+									<@div class="col-8">
+										<@input type='hidden' name="idFavorite" value='${(favorite.id)!}' />
+										<@input type='text' name="favorite" value='${(favorite.label)!}' tabIndex='0' params='disabled' />
+									</@div>
+									<@div class="col-2">
+										<@button type="submit" name="action_confirmRemoveAssociatedFavorite"  class="delete-favorite" id="${(favorite.id)!}" title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn btn-danger' />
+									</@div>
+								</@div>
+							</@tform>
+							</#list>
+							</#if>
+							<@tform method='post' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp'>							
+							<@div class="row mt-4">
+								<@div class="col-8">
+									<@input type='hidden' name="idCategory" value='${(category.id)!}' />
+									<@select name="idFavorite" items=favoritesWithoutCat default_value='' />
+								</@div>
+								<@div class="col-2">
+									<@button type="submit" name="action_associateFavoriteCategory" class="btn btn-primary " id="addFavorite">#i18n{module.mydashboard.favorites.modify_category.labelBindButton}</@button>
+								</@div>
+							</@div>
+							</@tform>
+						</@formGroup>
+					</@div>
+				</@div>					
 			</@boxBody>
 		</@box>
 	</@columns>

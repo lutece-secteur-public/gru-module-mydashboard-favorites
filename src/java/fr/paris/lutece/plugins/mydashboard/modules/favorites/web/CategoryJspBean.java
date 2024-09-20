@@ -38,6 +38,7 @@ import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.CategoryHo
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.CategoriesSubscriptionProviderService;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.provider.DemandTypeService;
 import fr.paris.lutece.plugins.subscribe.business.Subscription;
 import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
 import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
@@ -46,17 +47,20 @@ import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.url.UrlItem;
 
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * This class provides the user interface to manage Category features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageCategories.jsp", controllerPath = "jsp/admin/plugins/mydashboard/modules/favorites/", right = "FAVORITES_MANAGEMENT" )
-public class CategoryJspBean extends ManageFavoritesJspBean
+@Controller( controllerJsp = "ManageCategories.jsp", controllerPath = "jsp/admin/plugins/mydashboard/modules/favorites/", right = "CATEGORIES_MANAGEMENT" )
+public class CategoryJspBean extends ManageCategoriesJspBean
 {
     private static final long serialVersionUID = 1L;
     // Templates
@@ -66,6 +70,8 @@ public class CategoryJspBean extends ManageFavoritesJspBean
     
     // Parameters
     private static final String PARAMETER_ID_CATEGORY = "id";
+    private static final String PARAMETER_ID_FAVORITE = "idFavorite";
+    private static final String PARAMETER_ID_DEMAND_TYPE = "idDemandType";
     
     // Properties for page titles
     private static final String PROPERTY_PAGE_TITLE_MANAGE_CATEGORIES = "module.mydashboard.favorites.manage_categories.pageTitle";
@@ -75,11 +81,18 @@ public class CategoryJspBean extends ManageFavoritesJspBean
     // Markers
     private static final String MARK_CATEGORY_LIST = "category_list";
     private static final String MARK_CATEGORY = "category";
+    private static final String MARK_FAVORITES_WITHOUT_CAT = "favoritesWithoutCat";
+    private static final String MARK_FAVORITES_ASSOCIATED = "favoritesAssociated";
+    private static final String MARK_DEMAND_TYPES_WITHOUT_CAT = "demandTypesWithoutCat";
+    private static final String MARK_DEMAND_TYPES_ASSOCIATED = "demandTypesAssociated";
+           
     private static final String JSP_MANAGE_CATEGORIES = "jsp/admin/plugins/mydashboard/modules/favorites/ManageCategories.jsp";
     
     // Properties
     private static final String MESSAGE_CONFIRM_REMOVE_CATEGORY = "module.mydashboard.favorites.message.confirmRemoveCategory";
-
+    private static final String MESSAGE_CONFIRM_REMOVE_ASSOCIATED_FAVORITE = "module.mydashboard.favorites.message.confirmRemoveAssociatedFavorite";
+    private static final String MESSAGE_CONFIRM_REMOVE_ASSOCIATED_DEMAND_TYPE = "module.mydashboard.favorites.message.confirmRemoveAssociatedDemandType";
+    
     // Validations
     private static final String VALIDATION_ATTRIBUTES_PREFIX = "favorites.model.entity.category.attribute.";
 
@@ -93,13 +106,24 @@ public class CategoryJspBean extends ManageFavoritesJspBean
     private static final String ACTION_MODIFY_CATEGORY = "modifyCategory";
     private static final String ACTION_REMOVE_CATEGORY = "removeCategory";
     private static final String ACTION_CONFIRM_REMOVE_CATEGORY = "confirmRemoveCategory";
+    private static final String ACTION_REMOVE_ASSOCIATED_FAVORITE = "removeAssociatedFavorite";
+    private static final String ACTION_CONFIRM_REMOVE_ASSOCIATED_FAVORITE  = "confirmRemoveAssociatedFavorite";
+    private static final String ACTION_ASSOCIATE_FAVORITE_CATEGORY = "associateFavoriteCategory";   
+    private static final String ACTION_REMOVE_ASSOCIATED_DEMAND_TYPE = "removeAssociatedDemandType";
+    private static final String ACTION_CONFIRM_REMOVE_ASSOCIATED_DEMAND_TYPE  = "confirmRemoveAssociatedDemandType";
+    private static final String ACTION_ASSOCIATE_DEMAND_TYPE_CATEGORY = "associateDemandTypeCategory";
     
     // Infos
     private static final String INFO_CATEGORY_CREATED = "module.mydashboard.favorites.info.category.created";
     private static final String INFO_CATEGORY_UPDATED = "module.mydashboard.favorites.info.category.updated";
     private static final String INFO_CATEGORY_REMOVED = "module.mydashboard.favorites.info.category.removed";
+    private static final String INFO_ASSOCIATION_FAVORITE_CREATED = "module.mydashboard.favorites.info.association.favorite.created";    
+    private static final String INFO_ASSOCIATION_FAVORITE_REMOVED = "module.mydashboard.favorites.info.association.favorite.removed";
+    private static final String INFO_ASSOCIATION_DEMAND_TYPE_CREATED = "module.mydashboard.favorites.info.association.demand_type.created";    
+    private static final String INFO_ASSOCIATION_DEMAND_TYPE_REMOVED = "module.mydashboard.favorites.info.association.demand_type.removed";   
     private static final String ERROR_CATEGORY_CODE_ALREADY_EXIST = "module.mydashboard.favorites.error.category.code.already.exist";
     private static final String ERROR_CATEGORY_DELETE_HAS_FAVORITE = "module.mydashboard.favorites.error.category.delete.still.has.favorite";
+    private static final String ERROR_CATEGORY_DELETE_HAS_DEMAND_TYPE = "module.mydashboard.favorites.error.category.delete.still.has.demand_type";
     
     // Session variable to store working values
     private Category _category;
@@ -132,7 +156,9 @@ public class CategoryJspBean extends ManageFavoritesJspBean
 
         Map<String, Object> model = getModel(  );
         model.put( MARK_CATEGORY, _category );
-
+        model.put( MARK_FAVORITES_WITHOUT_CAT, FavoriteService.getInstance( ).getFavoritesWithoutCategory( ) );
+        model.put( MARK_DEMAND_TYPES_WITHOUT_CAT, DemandTypeService.getInstance( ).getDemandTypeServiceProvider( ).getRefListDemandTypeWithoutCategory( ) );
+        
         return getPage( PROPERTY_PAGE_TITLE_CREATE_CATEGORY, TEMPLATE_CREATE_CATEGORY, model );
     }
 
@@ -158,11 +184,54 @@ public class CategoryJspBean extends ManageFavoritesJspBean
             addError( ERROR_CATEGORY_CODE_ALREADY_EXIST, getLocale( ) );
             return redirectView( request, VIEW_CREATE_CATEGORY );
         }
-
+        
         CategoryHome.create( _category );
+        
+        addCategeryToFavorites( request );        
+        addCategoryToDemandTypes( request );
+        
         addInfo( INFO_CATEGORY_CREATED, getLocale(  ) );
 
         return redirectView( request, VIEW_MANAGE_CATEGORIES );
+    }
+
+    /**
+     * Add category to favorites
+     * @param request
+     */
+    private void addCategeryToFavorites( HttpServletRequest request )
+    {
+        //Bind favorites with category
+        String[] listIdFavorites = request.getParameterValues( PARAMETER_ID_FAVORITE );
+        if( listIdFavorites != null && listIdFavorites.length > 0 )
+        {
+            for( String idFavorites : listIdFavorites )
+            {
+                Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( idFavorites ) );
+                if( favorite != null && StringUtils.isEmpty( favorite.getCategoryCode( ) ) )
+                {
+                    favorite.setCategoryCode( _category.getCode( ) );
+                    FavoriteService.getInstance( ).update( favorite );
+                }              
+            }
+        }
+    }
+
+    /**
+     * Add category to demand types
+     * @param request
+     */
+    private void addCategoryToDemandTypes( HttpServletRequest request )
+    {
+        //Bind demand types with category
+        String[] listIdDemandTypes = request.getParameterValues( PARAMETER_ID_DEMAND_TYPE );
+        if( listIdDemandTypes != null && listIdDemandTypes.length > 0 )
+        {
+            for( String idDemandType : listIdDemandTypes )
+            {
+                DemandTypeService.getInstance( ).getDemandTypeServiceProvider( ).updateDemandType( Integer.parseInt( idDemandType ), _category.getCode( ) );
+            }
+        }
     }
 
     /**
@@ -195,11 +264,19 @@ public class CategoryJspBean extends ManageFavoritesJspBean
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CATEGORY ) );
         
-        List<Favorite> listFavorite = FavoriteService.getInstance( ).findFavoritesByCategoryCode( CategoryHome.findByPrimaryKey( nId ).getCode( ) );
+        Category catory = CategoryHome.findByPrimaryKey( nId );
+        
+        List<Favorite> listFavorite = FavoriteService.getInstance( ).findFavoritesByCategoryCode( catory.getCode( ) );
+        
+        ReferenceList refDemandTypes = DemandTypeService.getInstance( ).getDemandTypeServiceProvider( ).getRefListDemandType( catory.getCode( ) );
         
         if ( listFavorite != null && !listFavorite.isEmpty( ) )
         {
             addError( ERROR_CATEGORY_DELETE_HAS_FAVORITE, getLocale( ) );
+        }
+        else if ( !refDemandTypes.isEmpty( ) )
+        {
+            addError( ERROR_CATEGORY_DELETE_HAS_DEMAND_TYPE, getLocale( ) );
         }
         else
         {
@@ -229,6 +306,10 @@ public class CategoryJspBean extends ManageFavoritesJspBean
 
         Map<String, Object> model = getModel(  );
         model.put( MARK_CATEGORY, _category );
+        model.put( MARK_FAVORITES_WITHOUT_CAT, FavoriteService.getInstance( ).getFavoritesWithoutCategory( ) );
+        model.put( MARK_FAVORITES_ASSOCIATED, FavoriteService.getInstance( ).findAllActivatedFavoritesByCode( _category.getCode( ) ) );
+        model.put( MARK_DEMAND_TYPES_WITHOUT_CAT, DemandTypeService.getInstance( ).getDemandTypeServiceProvider( ).getRefListDemandTypeWithoutCategory( ) );
+        model.put( MARK_DEMAND_TYPES_ASSOCIATED, DemandTypeService.getInstance( ).getDemandTypeServiceProvider( ).getRefListDemandType( _category.getCode( ) ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_CATEGORY, TEMPLATE_MODIFY_CATEGORY, model );
     }
@@ -262,6 +343,118 @@ public class CategoryJspBean extends ManageFavoritesJspBean
         addInfo( INFO_CATEGORY_UPDATED, getLocale(  ) );
 
         return redirectView( request, VIEW_MANAGE_CATEGORIES );
+    }
+    
+    /**
+     * Action to confirm the deletion of the association between the category and the favorite
+     * @param request
+     * @return XPage
+     */
+    @Action( ACTION_CONFIRM_REMOVE_ASSOCIATED_FAVORITE )
+    public String getConfirmRemoveAssociatedFavorite( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );
+        UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_ASSOCIATED_FAVORITE ) );
+        url.addParameter( PARAMETER_ID_FAVORITE, nId );
+
+        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_ASSOCIATED_FAVORITE, url.getUrl(  ), AdminMessage.TYPE_CONFIRMATION );
+
+        return redirect( request, strMessageUrl );
+    }
+
+    /**
+     * Handles the removal association between favorite and category
+     *
+     * @param request The Http request
+     * @return the jsp URL to display the form to remove association between favorites and categories
+     */
+    @Action( ACTION_REMOVE_ASSOCIATED_FAVORITE )
+    public String doRemoveAssociatedFavorite( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );      
+        Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( nId );
+        
+        if ( favorite != null )
+        {
+            favorite.setCategoryCode( StringUtils.EMPTY );
+            FavoriteService.getInstance( ).update( favorite );
+            addInfo( INFO_ASSOCIATION_FAVORITE_REMOVED, getLocale( ) );
+        }
+
+        return redirect( request, VIEW_MODIFY_CATEGORY, PARAMETER_ID_CATEGORY, _category.getId( ) );
+    }
+    
+    /**
+     * Handles the removal association between favorite and category
+     *
+     * @param request The Http request
+     * @return the jsp URL to display the form to remove association between favorites and categories
+     */
+    @Action( ACTION_ASSOCIATE_FAVORITE_CATEGORY )
+    public String doAssociateFavoriteCategory( HttpServletRequest request )
+    {
+        int nIdFavorite = Integer.parseInt( request.getParameter( PARAMETER_ID_FAVORITE ) );
+        
+        Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( nIdFavorite );
+        if ( favorite != null && StringUtils.isEmpty( favorite.getCategoryCode( ) ) )
+        {
+            favorite.setCategoryCode( _category.getCode( ) );
+            FavoriteService.getInstance( ).update( favorite );
+            addInfo( INFO_ASSOCIATION_FAVORITE_CREATED, getLocale( ) );
+        }
+        return redirect( request, VIEW_MODIFY_CATEGORY, PARAMETER_ID_CATEGORY, _category.getId( ) );
+    }
+    
+    /**
+     * Action to confirm the deletion of the association between the category and demand type
+     * @param request
+     * @return XPage
+     */
+    @Action( ACTION_CONFIRM_REMOVE_ASSOCIATED_DEMAND_TYPE )
+    public String getConfirmRemoveAssociatedDemandType( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_DEMAND_TYPE ) );
+        UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_ASSOCIATED_DEMAND_TYPE ) );
+        url.addParameter( PARAMETER_ID_DEMAND_TYPE, nId );
+
+        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_ASSOCIATED_DEMAND_TYPE, url.getUrl(  ), AdminMessage.TYPE_CONFIRMATION );
+
+        return redirect( request, strMessageUrl );
+    }
+
+    /**
+     * Handles the removal association between demand type and category
+     *
+     * @param request The Http request
+     * @return the jsp URL to display the form to remove association between demand types and categories
+     */
+    @Action( ACTION_REMOVE_ASSOCIATED_DEMAND_TYPE )
+    public String doRemoveAssociatedDemandType( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_DEMAND_TYPE ) );      
+
+        DemandTypeService.getInstance( ).getDemandTypeServiceProvider( ).updateDemandType( nId,  StringUtils.EMPTY );
+
+        addInfo( INFO_ASSOCIATION_DEMAND_TYPE_REMOVED, getLocale( ) );
+   
+        return redirect( request, VIEW_MODIFY_CATEGORY, PARAMETER_ID_CATEGORY, _category.getId( ) );
+    }
+    
+    /**
+     * Handles the removal association between demand type and category
+     *
+     * @param request The Http request
+     * @return the jsp URL to display the form to remove association between demand types and categories
+     */
+    @Action( ACTION_ASSOCIATE_DEMAND_TYPE_CATEGORY )
+    public String doAssociateDemandTypeCategory( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_DEMAND_TYPE ) );
+        
+        DemandTypeService.getInstance( ).getDemandTypeServiceProvider( ).updateDemandType( nId, _category.getCode( ) );
+        addInfo( INFO_ASSOCIATION_DEMAND_TYPE_CREATED, getLocale( ) );
+
+        return redirect( request, VIEW_MODIFY_CATEGORY, PARAMETER_ID_CATEGORY, _category.getId( ) );
     }
     
     /**
