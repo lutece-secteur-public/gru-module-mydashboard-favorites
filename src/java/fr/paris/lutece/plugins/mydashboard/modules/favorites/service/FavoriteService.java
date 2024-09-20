@@ -40,12 +40,14 @@ import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHo
 import fr.paris.lutece.plugins.subscribe.business.Subscription;
 import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
 import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
+import fr.paris.lutece.util.ReferenceList;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 
 /**
@@ -92,6 +94,16 @@ public class FavoriteService {
     public Favorite findByPrimaryKey( int idFavorite )
     {
         return FavoriteHome.findByPrimaryKey( idFavorite );
+    }
+    
+    /**
+     * Update favorite
+     * @param favorite
+     * @return an updated favorite
+     */
+    public Favorite update( Favorite favorite )
+    {
+        return FavoriteHome.update( favorite );
     }
     
     /**
@@ -202,5 +214,23 @@ public class FavoriteService {
             jsonResponse.put( JSON_FAVORITES, jsonFavorites );               
         }
         return jsonResponse;
+    }
+    
+    /**
+     * Return reference list of favorites without category
+     * @return the reference list of favorites without category
+     */
+    public ReferenceList getFavoritesWithoutCategory ( )
+    {
+        ReferenceList refListFavorites = new ReferenceList();
+        List<Favorite> listFavorites = findAllActivatedFavorites( );        
+        listFavorites = listFavorites.stream( ).filter( favorite -> StringUtils.isEmpty( favorite.getCategoryCode( ) ) ).collect( Collectors.toList( ) );
+
+        for ( Favorite favorite : listFavorites )
+        {
+            refListFavorites.addItem( favorite.getId( ), favorite.getLabel( ) );
+        }
+        
+        return refListFavorites;
     }
 }
