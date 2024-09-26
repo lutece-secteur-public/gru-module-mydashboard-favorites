@@ -41,6 +41,11 @@ public final class Constants
 {
     public static final String API_PATH = "favorites-api";
     public static final String PATH_LAST_FAVORITES = "/lastFavorites";
+    public static final String PATH_ALL_FAVORITES = "/allFavorites";
+    public static final String PATH_ADD_FAVORITE = "/add";
+    public static final String PATH_FAVORITE_ID = "/{id}";
+    
+    public static final String PARAMETER_ID = "id";
     
     public static final String RESPONSE_UNAUTHORIZED = "{\"ResponseStatus\": {\"Error\": \"Unauthorized\"}}";
     

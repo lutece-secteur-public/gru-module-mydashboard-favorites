@@ -33,9 +33,15 @@
  */
 package fr.paris.lutece.plugins.mydashboard.modules.favorites.rest.rs;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -43,11 +49,24 @@ import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.Favorite;
+import fr.paris.lutece.plugins.mydashboard.modules.favorites.business.FavoriteHome;
 import fr.paris.lutece.plugins.mydashboard.modules.favorites.service.FavoriteService;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
+import fr.paris.lutece.plugins.subscribe.business.Subscription;
+import fr.paris.lutece.plugins.subscribe.business.SubscriptionFilter;
+import fr.paris.lutece.plugins.subscribe.service.SubscriptionService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.util.json.ErrorJsonResponse;
+import fr.paris.lutece.util.json.JsonResponse;
+import fr.paris.lutece.util.json.JsonUtil;
 
 /**
  * 
@@ -59,6 +78,14 @@ public class FavoritesRest
 {
     //Properties
     private static final String PROPERTY_NUMBER_OF_FAVORITES = "favorites.menu.numberOfFavorites.show";
+    
+    private static ObjectMapper _mapper;
+    
+    public FavoritesRest( )
+    {
+        _mapper = new ObjectMapper( ).configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false )
+        .configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false ).configure( SerializationFeature.WRAP_ROOT_VALUE, false );
+    }
     
     /**
      * Get last favorites
@@ -81,5 +108,73 @@ public class FavoritesRest
         }
         
         return Response.status( Response.Status.UNAUTHORIZED ).entity( Constants.RESPONSE_UNAUTHORIZED).build( );
+    }
+    
+    /**
+     * Get all favorites
+     * @param request
+     * @param nNbFavoritesToShow
+     * @return Json
+     */
+    @GET
+    @Path( Constants.PATH_ALL_FAVORITES )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces ( MediaType.APPLICATION_JSON  )
+    public Response getAllFavorites ( @Context HttpServletRequest request )
+    {   
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( FavoriteHome.getFavoritesList( ) ) ) ).build( );
+    }
+    
+    @POST
+    @Path( Constants.PATH_ADD_FAVORITE )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response addFavorite( String strFavoriteJson)
+    {
+        try
+        {
+            Favorite favorite = _mapper.readValue( strFavoriteJson, Favorite.class );
+            
+            if ( favorite != null )
+            {
+                FavoriteService.getInstance( ).create( favorite );
+                
+                return Response.status( Response.Status.CREATED ).entity( JsonUtil.buildJsonResponse( new JsonResponse( favorite ) ) ).build( );
+            }
+            
+            return Response.status( Response.Status.BAD_REQUEST )
+                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.getReasonPhrase( ) ) ) ).build( );
+        } 
+        catch ( JsonProcessingException e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.getReasonPhrase( ) ) ) ).build( );
+        }
+    }
+    
+    @DELETE
+    @Path( Constants.PATH_FAVORITE_ID )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response removeFavorite( @PathParam( Constants.PARAMETER_ID ) Integer id )
+    {
+        Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( id );
+        
+        if ( favorite != null )
+        {
+            //Remove all the subscription to the favorite
+            SubscriptionFilter filter = new SubscriptionFilter( );
+            filter.setIdSubscribedResource( Integer.toString( id ) );
+            List<Subscription> listSubscription = SubscriptionService.getInstance( ).findByFilter( filter );
+            for ( Subscription subscription : listSubscription )
+            {
+                SubscriptionService.getInstance( ).removeSubscription( subscription, false );
+            }
+            
+            FavoriteService.getInstance( ).removeFavorite( id );
+            
+            return Response.status( Response.Status.OK ).build( );
+        }
+        
+        return Response.status( Response.Status.NOT_FOUND ).build( );
     }
 }

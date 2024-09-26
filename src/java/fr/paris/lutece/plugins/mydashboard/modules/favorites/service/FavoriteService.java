@@ -97,6 +97,16 @@ public class FavoriteService {
     }
     
     /**
+     * Create an instance of the favorite class
+     * @param favorite The instance of the Favorite which contains the informations to store
+     * @return The  instance of favorite which has been created with its primary key.
+     */
+    public Favorite create( Favorite favorite )
+    {
+        return FavoriteHome.create( favorite );
+    }
+    
+    /**
      * Update favorite
      * @param favorite
      * @return an updated favorite
