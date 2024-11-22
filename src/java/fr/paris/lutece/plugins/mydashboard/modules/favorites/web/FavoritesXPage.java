@@ -46,6 +46,8 @@ import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
 import fr.paris.lutece.portal.web.xpages.XPage;
+
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -186,37 +188,27 @@ public class FavoritesXPage extends MVCApplication
      */
     private void setOrder( List<Subscription> listSubscriptionFavorites, String strNewOrder, Subscription subToSet )
     {
-        int nNewOrder = Integer.parseInt( strNewOrder );
-        int nOrderInit = 1;
+
+        int newOrder = Integer.parseInt( strNewOrder );
+        
+        // Trier la liste par ordre croissant
+        listSubscriptionFavorites.sort(Comparator.comparingInt(Subscription::getOrder));
+
+        // Retirer l'abonnement à repositionner de la liste
+        listSubscriptionFavorites.removeIf( sub -> sub.getIdSubscribedResource( ).equals( subToSet.getIdSubscribedResource( ) ) );
+
+        // S'assurer que l'ordre demandé est dans les limites valides
+        newOrder = Math.max( 1, Math.min( newOrder, listSubscriptionFavorites.size( ) + 1 ) );
+
+        // Ajouter l'abonnement à sa nouvelle position
+        listSubscriptionFavorites.add( newOrder - 1, subToSet );
+
+        // Réordonner les abonnements
+        int order = 1;
         for ( Subscription sub : listSubscriptionFavorites )
         {
-            if( subToSet != null && !subToSet.getIdSubscribedResource( ).equals( sub.getIdSubscribedResource( ) ) )
-            {
-                if ( nNewOrder < subToSet.getOrder( ) && sub.getOrder( ) >= nNewOrder 
-                        && sub.getOrder( ) < subToSet.getOrder( ) )
-                {
-                    sub.setOrder( sub.getOrder( ) + 1 );
-                    SubscriptionService.getInstance( ).setSubscription( sub );
-                }
-                else if ( nNewOrder > subToSet.getOrder( ) && sub.getOrder( ) <= nNewOrder 
-                        && sub.getOrder( ) > subToSet.getOrder( ))
-                {
-                    sub.setOrder( sub.getOrder( ) -1 );
-                    SubscriptionService.getInstance( ).setSubscription( sub );
-                }
-                else if ( subToSet.getOrder( ) == sub.getOrder( ) && nOrderInit != nNewOrder)
-                {
-                    sub.setOrder( nOrderInit );
-                    SubscriptionService.getInstance( ).setSubscription( sub );
-                }
-            }
-            nOrderInit++;
-        }
-        
-        if( subToSet != null )
-        {
-            subToSet.setOrder( nNewOrder );
-            SubscriptionService.getInstance( ).setSubscription( subToSet ); 
+            sub.setOrder( order++ );
+            SubscriptionService.getInstance( ).setSubscription( sub );
         }
     }
 
