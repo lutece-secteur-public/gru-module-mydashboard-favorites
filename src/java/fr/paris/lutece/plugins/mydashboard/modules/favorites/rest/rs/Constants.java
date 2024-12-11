@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.mydashboard.modules.favorites.rest.rs;
 
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 /**
  * Rest Constants
@@ -44,10 +45,16 @@ public final class Constants
     public static final String PATH_ALL_FAVORITES = "/allFavorites";
     public static final String PATH_ADD_FAVORITE = "/add";
     public static final String PATH_FAVORITE_ID = "/{id}";
+    public static final String PATH_REMOVE_FAVORITE = "/remove" + PATH_FAVORITE_ID;
     
     public static final String PARAMETER_ID = "id";
     
     public static final String RESPONSE_UNAUTHORIZED = "{\"ResponseStatus\": {\"Error\": \"Unauthorized\"}}";
+    
+    public static final String API_KEY_ERROR = "API KEY is missing or incorrect";
+    public static final String CONSTANT_X_API_KEY = "X-API-KEY";
+    
+    public static final String PROPERTY_REST_API_KEY = AppPropertiesService.getProperty( "favorites.rest.api.key" );
     
     /**
      * Private constructor

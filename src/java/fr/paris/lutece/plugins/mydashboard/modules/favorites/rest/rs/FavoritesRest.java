@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -129,52 +130,66 @@ public class FavoritesRest
     @Path( Constants.PATH_ADD_FAVORITE )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response addFavorite( String strFavoriteJson)
+    public Response addFavorite( String strFavoriteJson, @HeaderParam( Constants.CONSTANT_X_API_KEY ) String strApiKey)
     {
-        try
+        if( Constants.PROPERTY_REST_API_KEY.equals( strApiKey ) )
         {
-            Favorite favorite = _mapper.readValue( strFavoriteJson, Favorite.class );
-            
-            if ( favorite != null )
+            try
             {
-                FavoriteService.getInstance( ).create( favorite );
+                Favorite favorite = _mapper.readValue( strFavoriteJson, Favorite.class );
                 
-                return Response.status( Response.Status.CREATED ).entity( JsonUtil.buildJsonResponse( new JsonResponse( favorite ) ) ).build( );
+                if ( favorite != null )
+                {
+                    FavoriteService.getInstance( ).create( favorite );
+                    
+                    return Response.status( Response.Status.CREATED ).entity( JsonUtil.buildJsonResponse( new JsonResponse( favorite ) ) ).build( );
+                }
+                
+                return Response.status( Response.Status.BAD_REQUEST )
+                        .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.getReasonPhrase( ) ) ) ).build( );
+            } 
+            catch ( JsonProcessingException e )
+            {
+                return Response.status( Response.Status.BAD_REQUEST )
+                        .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.getReasonPhrase( ) ) ) ).build( );
             }
-            
-            return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.getReasonPhrase( ) ) ) ).build( );
-        } 
-        catch ( JsonProcessingException e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.getReasonPhrase( ) ) ) ).build( );
         }
+        
+        return Response.status( Response.Status.UNAUTHORIZED )
+                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Constants.API_KEY_ERROR ) ) )
+                .build( );
     }
     
     @DELETE
-    @Path( Constants.PATH_FAVORITE_ID )
+    @Path( Constants.PATH_REMOVE_FAVORITE )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response removeFavorite( @PathParam( Constants.PARAMETER_ID ) Integer id )
+    public Response removeFavorite( @PathParam( Constants.PARAMETER_ID ) Integer id, @HeaderParam( Constants.CONSTANT_X_API_KEY ) String strApiKey )
     {
-        Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( id );
-        
-        if ( favorite != null )
+        if( Constants.PROPERTY_REST_API_KEY.equals( strApiKey ) )
         {
-            //Remove all the subscription to the favorite
-            SubscriptionFilter filter = new SubscriptionFilter( );
-            filter.setIdSubscribedResource( Integer.toString( id ) );
-            List<Subscription> listSubscription = SubscriptionService.getInstance( ).findByFilter( filter );
-            for ( Subscription subscription : listSubscription )
+            Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( id );
+            
+            if ( favorite != null )
             {
-                SubscriptionService.getInstance( ).removeSubscription( subscription, false );
+                //Remove all the subscription to the favorite
+                SubscriptionFilter filter = new SubscriptionFilter( );
+                filter.setIdSubscribedResource( Integer.toString( id ) );
+                List<Subscription> listSubscription = SubscriptionService.getInstance( ).findByFilter( filter );
+                for ( Subscription subscription : listSubscription )
+                {
+                    SubscriptionService.getInstance( ).removeSubscription( subscription, false );
+                }
+                
+                FavoriteService.getInstance( ).removeFavorite( id );
+                
+                return Response.status( Response.Status.OK ).build( );
             }
             
-            FavoriteService.getInstance( ).removeFavorite( id );
-            
-            return Response.status( Response.Status.OK ).build( );
+            return Response.status( Response.Status.NOT_FOUND ).build( );
         }
         
-        return Response.status( Response.Status.NOT_FOUND ).build( );
+        return Response.status( Response.Status.UNAUTHORIZED )
+                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Constants.API_KEY_ERROR ) ) )
+                .build( );
     }
 }
