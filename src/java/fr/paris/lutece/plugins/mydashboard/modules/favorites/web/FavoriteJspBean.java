@@ -56,6 +56,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -77,6 +78,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     // Parameters
     private static final String PARAMETER_ID_FAVORITE = "id";
     private static final String PARAMETER_IMPORT_FAVORITES = "import_favorites";
+    private static final String PARAMETER_CATEGORY_FILTER = "categoryFilter";
 
     // Properties for page titles
     private static final String PROPERTY_PAGE_TITLE_MANAGE_FAVORITES = "module.mydashboard.favorites.manage_favorites.pageTitle";
@@ -89,6 +91,8 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     private static final String MARK_IMPORT_FAVORITES = "import_favorites";
     private static final String MARK_CATEGORY_LIST = "category_list";
     private static final String MARK_PICTOGRAMME = "pictogramme";
+    private static final String MARK_CATEGORY_FILTER = "categoryFilter";
+
     
     private static final String JSP_MANAGE_FAVORITES = "jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp";
     
@@ -124,6 +128,9 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     //Separators
     private static final String SEPARATOR_IDENTIFIER = "_";
     
+    //CONSTANTS
+    private static final String CONSTANT_EMPTY = "empty";
+    
     // Session variable to store working values
     private Favorite _favorite;
     
@@ -137,8 +144,25 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
     {
         _favorite = null;
         List<Favorite> listFavorites = FavoriteHome.getFavoritesList(  );
+        
+        String strCategoryFilter = request.getParameter( PARAMETER_CATEGORY_FILTER );
+        
+        if( StringUtils.isNotEmpty( strCategoryFilter ) && !strCategoryFilter.equals( CONSTANT_EMPTY ) && !strCategoryFilter.equals( "-1" ) )
+        {
+            listFavorites = listFavorites.stream( )
+                    .filter( f -> f.getCategoryCode( ) != null && f.getCategoryCode( ).equalsIgnoreCase( strCategoryFilter ) )
+                    .collect( Collectors.toList( ) );
+        }
+        else if ( StringUtils.isNotEmpty( strCategoryFilter ) && strCategoryFilter.equals( CONSTANT_EMPTY )  )
+        {
+            listFavorites = listFavorites.stream( )
+                    .filter( f -> StringUtils.isEmpty(f.getCategoryCode( )) ).collect( Collectors.toList( ) );
+        }
+        
         Map<String, Object> model = getPaginatedListModel( request, MARK_FAVORITE_LIST, listFavorites, JSP_MANAGE_FAVORITES );
-
+        model.put( MARK_CATEGORY_LIST, getCategoryList( false ) );
+        model.put( MARK_CATEGORY_FILTER, strCategoryFilter );
+        
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_FAVORITES, TEMPLATE_MANAGE_FAVORITES, model );
     }
 
@@ -155,7 +179,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
 
         Map<String, Object> model = getModel(  );
         model.put( MARK_FAVORITE, _favorite );
-        model.put( MARK_CATEGORY_LIST, getCategoryList( ) );
+        model.put( MARK_CATEGORY_LIST, getCategoryList( true ) );
 
         return getPage( PROPERTY_PAGE_TITLE_CREATE_FAVORITE, TEMPLATE_CREATE_FAVORITE, model );
     }
@@ -262,7 +286,7 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
 
         Map<String, Object> model = getModel(  );
         model.put( MARK_FAVORITE, _favorite );
-        model.put( MARK_CATEGORY_LIST, getCategoryList( ) );
+        model.put( MARK_CATEGORY_LIST, getCategoryList( true ) );
         FileImagePublicService.init( );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_FAVORITE, TEMPLATE_MODIFY_FAVORITE, model );
@@ -379,11 +403,14 @@ public class FavoriteJspBean extends ManageFavoritesJspBean
         return redirectView( request, VIEW_MANAGE_FAVORITES );
     }
     
-    private ReferenceList getCategoryList( )
+    private ReferenceList getCategoryList( boolean bAddDashItem )
     {
         ReferenceList referenceList = new ReferenceList( );
         
-        referenceList.addItem( -1, "-" );
+        if( bAddDashItem )
+        {
+            referenceList.addItem( -1, "-" );
+        }
         
         for ( Category category : CategoryHome.getCategoriesList( ) )
         {
