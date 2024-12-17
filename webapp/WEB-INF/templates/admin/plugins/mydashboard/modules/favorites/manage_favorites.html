@@ -10,7 +10,24 @@
 					</@tform>
 				</div>
 			</div>
-			<@boxBody>    
+			<@boxBody>
+				<@div class="col-12 col-lg-4">
+					<@tform name='filterFavorites' action='jsp/admin/plugins/mydashboard/modules/favorites/ManageFavorites.jsp'>
+							<label>#i18n{module.mydashboard.favorites.manage_favorites.filter.label}</label>
+							<@div class="d-flex">
+								<select name="categoryFilter" class="form-select">
+									<option value="-1" <#if categoryFilter?? && categoryFilter == '-1'>selected="selected"</#if>>-</option>
+									<option value="empty" <#if categoryFilter?? && categoryFilter == 'empty'>selected="selected"</#if>>Rubrique sectorielle vide</option>						
+									<#if category_list?? && category_list?has_content>
+										<#list category_list as category>
+											<option value="${category.code}" <#if categoryFilter?? && categoryFilter == category.code>selected="selected"</#if>>${category.name}</option>		
+										</#list>	
+									</#if>
+								</select>
+								<@button type='submit' name='view_manageFavorites' title='#i18n{module.mydashboard.favorites.manage_favorites.filter.btn}' size='md' />
+							</@div>
+					</@tform>
+				</@div>
 				<@messages infos=infos />
 				<@paginationAdmin paginator=paginator combo=1 />
 				<@table>
