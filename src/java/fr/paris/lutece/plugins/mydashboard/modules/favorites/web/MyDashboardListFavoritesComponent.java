@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.mydashboard.modules.favorites.web;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -104,6 +105,10 @@ public class MyDashboardListFavoritesComponent extends MyDashboardComponent
                 listFavoritesSuscribed.add( favorite );
             }
         }
+        
+        //Descending sort
+        listFavoritesSuscribed.sort( Comparator.comparingInt( Favorite::getOrder ) );
+        
         int maxFavorite = AppPropertiesService.getPropertyInt( PROPERTY_NUMBER_OF_FAVORITES_MAX, 6 );
         if ( listFavoritesSuscribed.size( ) > maxFavorite )
         {
