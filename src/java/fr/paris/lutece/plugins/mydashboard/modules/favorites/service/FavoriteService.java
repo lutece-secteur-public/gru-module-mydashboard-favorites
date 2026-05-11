@@ -206,19 +206,26 @@ public class FavoriteService {
         List<Subscription> listFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter );
         if( !listFavorites.isEmpty( ) )
         {
-            listFavorites = listFavorites.stream( ).sorted( Comparator.comparing( Subscription::getOrder ) ).limit( nNbFavoriteToShow ).collect( Collectors.toList() );
+            listFavorites = listFavorites.stream( ).sorted( Comparator.comparing( Subscription::getOrder ) ).collect( Collectors.toList() );
             
             List<JSONObject> jsonFavorites = new ArrayList<>();
             for ( Subscription sub : listFavorites )
             {
-                JSONObject jsonFavorite = new JSONObject( );
-
-                Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
-                jsonFavorite.put( JSON_ORDER, sub.getOrder( ) );
-                jsonFavorite.put( JSON_LABEL, favorite.getLabel( ) );
-                jsonFavorite.put( JSON_URL, favorite.getUrl( ) );
+            	//Stop if the maximum number of favorites is reached
+                if ( jsonFavorites.size() >= nNbFavoriteToShow ){
+                    break;
+                }
                 
-                jsonFavorites.add( jsonFavorite );
+                Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
+                if(favorite!=null) {
+                    JSONObject jsonFavorite = new JSONObject( );
+
+	                jsonFavorite.put( JSON_ORDER, sub.getOrder( ) );
+	                jsonFavorite.put( JSON_LABEL, favorite.getLabel( ) );
+	                jsonFavorite.put( JSON_URL, favorite.getUrl( ) );
+	                
+	                jsonFavorites.add( jsonFavorite );
+                }
             }
             
             jsonResponse.put( JSON_FAVORITES, jsonFavorites );               

@@ -99,7 +99,9 @@ public class MyDashboardListFavoritesComponent extends MyDashboardComponent
         for ( Subscription sub : listFavorites )
         {
             Favorite favorite = FavoriteService.getInstance( ).findByPrimaryKey( Integer.parseInt( sub.getIdSubscribedResource( ) ) );
-            if ( PARAMETER_ALL.equals( request.getParameter( PARAMETER_CATEGORY_CODE ) ) || ( favorite.getCategoryCode( ) != null && favorite.getCategoryCode( ).equals( request.getParameter( PARAMETER_CATEGORY_CODE ) ) ) )
+            if ( favorite != null && ( PARAMETER_ALL.equals( request.getParameter( PARAMETER_CATEGORY_CODE ) ) 
+            		|| ( favorite.getCategoryCode( ) != null 
+            			&& favorite.getCategoryCode( ).equals( request.getParameter( PARAMETER_CATEGORY_CODE ) ) ) ) )
             {
                 favorite.setOrder( sub.getOrder( ) );
                 listFavoritesSuscribed.add( favorite );

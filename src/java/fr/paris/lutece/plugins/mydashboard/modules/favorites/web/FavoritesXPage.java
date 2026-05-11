@@ -93,7 +93,7 @@ public class FavoritesXPage extends MVCApplication
         sFilter.setSubscriptionProvider( FavoritesSubscriptionProviderService.getInstance( ).getProviderName( ) );
         List<Subscription> listSubscriptionFavorites = SubscriptionService.getInstance( ).findByFilter( sFilter ); 
         
-        if ( listSubscriptionFavorites.isEmpty() )
+        if ( StringUtils.isNumeric(strIdFavorite) && listSubscriptionFavorites.isEmpty() )
         {
             Subscription sub = new Subscription( );
             sub.setIdSubscribedResource( strIdFavorite );
