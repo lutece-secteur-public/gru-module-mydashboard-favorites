@@ -1,108 +1,143 @@
 <#function isFavoriteChecked favorites_checked_list favorite>
-    <#if favorites_checked_list?? && favorites_checked_list?has_content>
-        <#list favorites_checked_list as favorite_checked>
-            <#if favorite_checked.id = favorite.id>
-                <#return true>
-            </#if>
-        </#list>
-    </#if>
-    <#return false>
+<#if favorites_checked_list?? && favorites_checked_list?has_content><#list favorites_checked_list as favorite_checked><#if favorite_checked.id = favorite.id><#return true></#if></#list></#if>
+<#return false>
 </#function>
-
 <!-- Dashboard Component for favorites -->
-<div class="portal">
-    <h2>#i18n{module.mydashboard.favorites.component.description}</h2>
-    <p>
-        <a data-target="#myFavorites" data-toggle="modal" href="#" id="myfav" class="btn btn-link">#i18n{module.mydashboard.favorites.component.modify}</a>
-    </p>
-    <div id="favorite-items">
+<@cCard class='secondary' title='#i18n{module.mydashboard.favorites.component.description}' imgTitle='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 8v4.172a2 2 0 0 0 .586 1.414l5.71 5.71a2.41 2.41 0 0 0 3.408 0l3.592 -3.592a2.41 2.41 0 0 0 0 -3.408l-5.71 -5.71a2 2 0 0 0 -1.414 -.586h-4.172a2 2 0 0 0 -2 2z" /><path d="M18 19l1.592 -1.592a4.82 4.82 0 0 0 0 -6.816l-4.592 -4.592" /><path d="M7 10h-.01" /></svg>' imgType='svg'>
+<@cText>#i18n{module.mydashboard.favorites.favorites.component.description}</@cText>
+<#if favorites_checked_list??>
+    <#if favorites_checked_list?size != 0>    
+    <@cText>
+        <@cBtn label='#i18n{module.mydashboard.favorites.component.modify}' id='myfav' params='data-target="#myFavorites" data-bs-toggle="modal"' />
+    </@cText>
+    <@chList id="favorite-items">
         <#list favorites_checked_list?sort_by("order") as favorite>
-            <div class="m-1 favorite_block" data-id="${favorite.id}">
-                <i class="fa fa-arrows" aria-hidden="true"></i><a data-favorite="${favorite.id}" class="btn btn-info btn-demande" target="_self" href="${favorite.url}">${favorite.label} </a><i class="delete_favorite fa fa-trash"></i>
-            </div>
+            <@chItem class='m-1 favorite_block' params='data-id="${favorite.id}"'>
+                <@cLink label=favorite.label! class='btn btn-info btn-demande' target='_self' href=favorite.url! params='data-favorite="${favorite.id}"' />
+                <@parisIcon name='trash delete_favorite' />
+            </@chItem>
         </#list>
-	</div>
-		<div class="form-group">
-	    	<div class="col-lg-4 col-xs-12">
-				<input class="form-control" id="favorite" placeHolder=" + Ajouter un autre service numérique"></input>
-			</div>
-		</div>
-</div>
-<script type="text/javascript" src="js/jquery/plugins/ui/jquery.ui.custom-autocomplete.min.js"></script>
-<script type="text/javascript" src="js/plugins/mydashboard/modules/favorites/sortable/Sortable.min.js"></script>
-
+    </@chList>
+    <@cField label='#i18n{module.mydashboard.favorites.add.favorites}'>
+        <@cInputGroup>
+            <@cInput id='favorite' name='favorite' />
+            <@cBtn label='#i18n{module.mydashboard.favorites.validate.favorites}' class='btn btn-primary' id='add_favorite' />
+        </@cInputGroup>
+    </@cField>
+<#else>
+    <@cAlert class='warning' title='#i18n{portal.util.labelNoItem}' />
+</#if>
+</#if>
+</@cCard>
+<script src="js/jquery/plugins/ui/jquery.ui.custom-autocomplete.min.js"></script>
+<script src="${commonsSharedPath}${commonsJsPath}lib/sortable/Sortable.min.js"></script> 
 <script>
-$( function(){
-    $('.delete_favorite').on('click', function(event) 
-    {
-        var tagId = $(this).data( "favorite" );
-        var favBlock = $(this).parent(".favorite_block");
-
-        $.ajax(
-        {
-            type: 'post',
-            url: 'jsp/site/Portal.jsp?page=favorites&action=delete_favorite',
-            data: 'favorite=' + tagId,
-            success: function( e )
-            {
-               $(favBlock).remove();
+document.addEventListener('DOMContentLoaded', function() {
+    // Delete favorite functionality
+    document.querySelectorAll('.delete_favorite').forEach(function(element) {
+        element.addEventListener('click', function(event) {
+            const tagId = this.getAttribute('data-favorite');
+            const favBlock = this.closest('.favorite_block');
+            fetch('jsp/site/Portal.jsp?page=favorites&action=delete_favorite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'favorite=' + encodeURIComponent(tagId)
+            })
+            .then(response => response.json())
+            .then(data => {
+                favBlock.remove();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+    
+    // Available favorites for autocomplete
+    const availableFavorites = [<#if favorites_list?has_content><#list favorites_list?sort_by("label") as favorite>{label:"${favorite.label}", value:"${favorite.id}"},</#list></#if>];
+    
+    // Simple autocomplete implementation
+    const favoriteInput = document.getElementById('favorite');
+    const autocompleteContainer = document.createElement('div');
+    autocompleteContainer.className = 'autocomplete-suggestions list-group position-absolute w-100';
+    autocompleteContainer.style.zIndex = '1000';
+    favoriteInput.parentNode.appendChild(autocompleteContainer);
+    
+    favoriteInput.addEventListener('input', function() {
+        const value = this.value.toLowerCase();
+        autocompleteContainer.innerHTML = '';
+        
+        if (value.length > 0) {
+            const filtered = availableFavorites.filter(item => 
+                item.label.toLowerCase().includes(value)
+            );
+            
+            filtered.forEach(item => {
+                const suggestion = document.createElement('a');
+                suggestion.className = 'list-group-item list-group-item-action';
+                suggestion.href = '#';
+                suggestion.textContent = item.label;
+                suggestion.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    favoriteInput.value = item.label;
+                    autocompleteContainer.innerHTML = '';
+                    addFavorite(item.value);
+                });
+                autocompleteContainer.appendChild(suggestion);
+            });
+        }
+    });
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!favoriteInput.contains(e.target)) {
+            autocompleteContainer.innerHTML = '';
+        }
+    });
+    
+    // Sortable functionality
+    const el = document.getElementById('favorite-items');
+    const sortable = Sortable.create(el, {
+        onEnd: function (evt) {
+            const idFavorite = evt.item.dataset['id'];
+            const newIndex = evt.newIndex + 1;
+            setOrderFavorite(idFavorite, newIndex);
+        },
+    });
+    
+    function addFavorite(id) {
+        fetch('jsp/site/Portal.jsp?page=favorites&action=add_favorite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            dataType : 'json'
-        });
-    });
-    
-    var availableFavorites = [
-        <#if favorites_list?has_content>
-        <#list favorites_list?sort_by("label") as favorite>
-        	{label:"${favorite.label}", value:"${favorite.id}"},
-        </#list>
-        </#if>
-    ];
-    
-    $( "#favorite" ).autocomplete({
-      source: availableFavorites,
-      select:function(event,ui){
-          $("#favorite").val(ui.item.label);
-          addFavorite(ui.item.value);
-          
-          return false;
-       }
-    });
-    
-    var el = document.getElementById('favorite-items');
-    var sortable = Sortable.create(el, {
-  	  onEnd: function (evt) {
-  		var idFavorite = evt.item.dataset['id'];
-  		var newIndex = evt.newIndex + 1;
-  		
-  		setOrderFavorite( idFavorite, newIndex );
-  	},
-    });
-    
-    function addFavorite( id ){
-        $.ajax({
-	         type: 'post',
-	         url: 'jsp/site/Portal.jsp?page=favorites&action=add_favorite',
-	         data: 'favorite=' + id,
-	         success: function( data )
-	         {
-	       		window.location.reload();
-	         },
-	         dataType : 'json'
-        });
+            body: 'favorite=' + encodeURIComponent(id)
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.reload();
+        })
+        .catch(error => console.error('Error:', error));
     }
-    function setOrderFavorite( id, newOrder ){
-    	var data = {favorite: id,newOrder: newOrder};
-        $.ajax({
-             type: 'post',
-             url: 'jsp/site/Portal.jsp?page=favorites&action=set_order',
-             data: data,
-             success: function( data )
-             {
-            	 
-             },
-             dataType : 'json'
+    
+    function setOrderFavorite(id, newOrder) {
+        const data = new URLSearchParams({
+            favorite: id,
+            newOrder: newOrder
         });
+        
+        fetch('jsp/site/Portal.jsp?page=favorites&action=set_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: data
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle success if needed
+        })
+        .catch(error => console.error('Error:', error));
     }
 });
 </script>
