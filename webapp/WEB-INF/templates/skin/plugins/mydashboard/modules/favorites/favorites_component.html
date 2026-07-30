@@ -14,7 +14,7 @@
         <#list favorites_checked_list?sort_by("order") as favorite>
             <@chItem class='m-1 favorite_block' params='data-id="${favorite.id}"'>
                 <@cLink label=favorite.label! class='btn btn-info btn-demande' target='_self' href=favorite.url! params='data-favorite="${favorite.id}"' />
-                <@parisIcon name='trash delete_favorite' />
+                <@cIcon name='trash delete_favorite' />
             </@chItem>
         </#list>
     </@chList>
